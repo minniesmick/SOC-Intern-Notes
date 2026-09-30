@@ -3,6 +3,7 @@
 
 Usage:  python build.py            # builds every map in data/ plus index.html
         python build.py falcon     # builds just one
+        python build.py --pages    # relative links between maps, for GitHub Pages
 """
 import json
 import pathlib
@@ -16,6 +17,11 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Set this once you publish index.html, so each map links back to it.
 INDEX_URL = (ROOT / "index-url.txt").read_text().strip() if (ROOT / "index-url.txt").exists() else ""
+
+# --pages: link maps and index to each other by relative path instead of artifact URLs.
+PAGES = "--pages" in sys.argv
+if PAGES:
+    INDEX_URL = "index.html"
 
 
 def build_map(cfg_path: pathlib.Path) -> pathlib.Path:
@@ -41,7 +47,7 @@ def build_map(cfg_path: pathlib.Path) -> pathlib.Path:
 
 def build_index(cfgs):
     cards = "\n".join(
-        f'''      <a class="card" href="{c.get("url", "#")}">
+        f'''      <a class="card" href="{f'{c["id"]}-map.html' if PAGES else c.get("url", "#")}">
         <span class="card-emoji">{c["emoji"]}</span>
         <span class="card-body">
           <span class="card-title">{c["rootTitle"]}</span>
@@ -55,7 +61,7 @@ def build_index(cfgs):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Concept Maps</title>
+<title>SOC Intern Notes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -88,7 +94,7 @@ def build_index(cfgs):
 <body>
 <div class="wrap">
   <header>
-    <h1>concept maps</h1>
+    <h1>SOC Intern Notes</h1>
     <p>Interactive study maps from the SOC internship. Tap a map to open it.</p>
   </header>
   <div class="cards">
@@ -105,7 +111,7 @@ def build_index(cfgs):
 
 
 if __name__ == "__main__":
-    targets = sys.argv[1:]
+    targets = [a for a in sys.argv[1:] if not a.startswith("--")]
     paths = sorted(DATA_DIR.glob("*.json"))
     if targets:
         paths = [p for p in paths if p.stem in targets]

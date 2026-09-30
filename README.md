@@ -1,9 +1,13 @@
-# concept-maps
+# SOC Intern Notes
 
 Interactive radial concept maps for SOC study notes. Each map is a single
 self-contained HTML file generated from a JSON data file.
 
 ## Live maps
+
+GitHub Pages (rebuilt on every push to `main`): https://minniesmick.github.io/SOC-Intern-Notes/
+
+Claude artifacts:
 
 | Map | Link |
 |---|---|
@@ -19,7 +23,8 @@ self-contained HTML file generated from a JSON data file.
 ## Layout
 
 ```
-concept-maps/
+SOC Intern Notes/
+├── .github/workflows/pages.yml  # builds with --pages and deploys dist/ to GitHub Pages
 ├── template.html      # the reusable map shell — edit only to change design/behavior
 ├── build.py           # generates HTML from template + data
 ├── index-url.txt      # published index URL, used for the "← all maps" backlink
@@ -42,10 +47,10 @@ generated HTML directly — regenerate it instead.
 python -m pip install --upgrade pip   # nothing else needed, stdlib only
 python build.py                       # build every map + index
 python build.py falcon                # build just one
+python build.py --pages               # relative links, as deployed to GitHub Pages
 ```
 
-Output goes to `/mnt/user-data/outputs/`. Change `OUT_DIR` in `build.py` for
-a local path on Windows.
+Output goes to `dist/` (git-ignored).
 
 ## Adding a new map
 
