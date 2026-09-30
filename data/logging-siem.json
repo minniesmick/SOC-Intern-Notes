@@ -1,0 +1,327 @@
+{
+  "id": "logging-siem",
+  "slug": "siem",
+  "emoji": "📊",
+  "accent": "#4fc77d",
+  "accentDim": "#164a2c",
+  "title": "Logging & SIEM Concept Map",
+  "subtitle": "From a single log line to a confirmed incident. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. CEF, sourcetype, triage…",
+  "rootLabel": "Logging & SIEM",
+  "rootTitle": "Logging & SIEM",
+  "rootDesc": "Everything a SOC knows, it knows from logs. This map follows the chain: an application writes a log, a format carries it, a SIEM collects and correlates it, a rule turns it into an alert, and an analyst decides whether it is an incident. Splunk appears here as the specific tool, but the concepts transfer to any SIEM.",
+  "modules": [
+    {
+      "id": "app-logs",
+      "tag": "L1",
+      "title": "Application Logs",
+      "sub": "The source",
+      "desc": "Records an application writes about its own behavior. Unlike OS or device logs, the application's own code decides what gets written — so what is missing is a development decision, not a collection failure.",
+      "children": [
+        {
+          "title": "Access log",
+          "desc": "Who reached what. A web server line carries client IP, timestamp, method and URI, status code, bytes, referer, user-agent, and response time."
+        },
+        {
+          "title": "Error log",
+          "desc": "Exceptions and stack traces. Useful for detection, dangerous if exposed to users — that exposure is OWASP A02."
+        },
+        {
+          "title": "Debug / trace log",
+          "desc": "Verbose developer output. Left enabled in production it leaks internal paths, versions, and sometimes credentials."
+        },
+        {
+          "title": "What to hunt in them",
+          "desc": "Sequential object IDs in one session (IDOR), clusters of 401/403 (brute force), spikes of 500s (injection attempts), scanner user-agents, unusual response-time patterns (time-based SQLi)."
+        }
+      ]
+    },
+    {
+      "id": "audit-logs",
+      "tag": "L2",
+      "title": "Audit Logs",
+      "sub": "Accountability",
+      "desc": "Who did what, when, and to what. Where an access log answers 'what happened', an audit log answers 'who is accountable' — which gives it legal and regulatory weight an ordinary log does not carry.",
+      "children": [
+        {
+          "title": "What belongs in one",
+          "desc": "Account creation and deletion, permission changes, configuration changes, access to sensitive records, authentication outcomes, and business-critical transactions."
+        },
+        {
+          "title": "Immutability",
+          "desc": "Append-only and stored off the originating host. An attacker who can edit the audit trail can erase the entire investigation."
+        },
+        {
+          "title": "Time synchronization",
+          "desc": "NTP across every source. If clocks drift, correlation between systems silently breaks and timelines become unusable."
+        },
+        {
+          "title": "Retention",
+          "desc": "Banking regulation drives retention measured in years, not days — and drives which index the data lands in."
+        },
+        {
+          "title": "Examples",
+          "desc": "AWS CloudTrail, Windows Security Event Log, Linux auditd, database audit trails."
+        }
+      ]
+    },
+    {
+      "id": "syslog",
+      "tag": "F1",
+      "title": "Syslog",
+      "sub": "RFC 5424",
+      "desc": "Both a transport protocol and a format — the long-standing default for network devices and Unix systems. Sent over UDP 514, TCP 514, or TLS 6514.",
+      "children": [
+        {
+          "title": "Structure",
+          "desc": "Priority (facility plus severity), version, timestamp, hostname, app name, PID, message ID, structured data, then the message."
+        },
+        {
+          "title": "The free-text problem",
+          "desc": "The message body is not standardized. Extracting a username from a sentence requires a regex, and every vendor phrases it differently — so every source needs its own parser."
+        },
+        {
+          "title": "Where you meet it",
+          "desc": "Firewalls, switches, Linux hosts, appliances — anything that predates or ignores structured logging."
+        }
+      ]
+    },
+    {
+      "id": "cef",
+      "tag": "F2",
+      "title": "CEF",
+      "sub": "Common Event Format",
+      "desc": "Originally from ArcSight. Normalizes log content into standard field names, usually carried over syslog. The point is that src always means source IP, whichever vendor wrote the line.",
+      "children": [
+        {
+          "title": "Header",
+          "desc": "Seven pipe-delimited fields: CEF version, device vendor, device product, device version, signature ID, name, severity."
+        },
+        {
+          "title": "Extension",
+          "desc": "Key=value pairs using a standard dictionary — src, dst, spt, dpt, duser, act — which removes most of the parser-writing burden."
+        },
+        {
+          "title": "Flat by design",
+          "desc": "No nesting. Simple and predictable, but it cannot express structured objects the way JSON can."
+        },
+        {
+          "title": "Where you meet it",
+          "desc": "Security appliances above all — firewalls, IPS, DLP, mail gateways."
+        }
+      ]
+    },
+    {
+      "id": "json",
+      "tag": "F3",
+      "title": "JSON",
+      "sub": "Structured",
+      "desc": "Key-value structure that can nest. The default for modern applications, cloud services, and containers.",
+      "children": [
+        {
+          "title": "Nesting",
+          "desc": "Related fields group naturally — a source object holding both ip and port, a geo object holding country and city."
+        },
+        {
+          "title": "Trade-off",
+          "desc": "Trivially parseable and expressive, but the largest on the wire since every key repeats on every event, which costs ingestion volume."
+        },
+        {
+          "title": "Field naming",
+          "desc": "Structure is guaranteed; vocabulary is not. Schemas like ECS and OCSF exist precisely to impose a common dictionary on top."
+        }
+      ]
+    },
+    {
+      "id": "format-compare",
+      "tag": "F4",
+      "title": "Format Comparison",
+      "sub": "The exam answer",
+      "desc": "The distinction in one line: syslog solves transport and leaves content free; CEF standardizes field names but stays flat; JSON is flexible and nestable but guarantees no common vocabulary.",
+      "children": [
+        {
+          "title": "Parseability",
+          "desc": "Syslog needs regex; CEF and JSON parse natively. This is the single biggest practical difference when onboarding a new source."
+        },
+        {
+          "title": "Size on the wire",
+          "desc": "Syslog smallest, CEF middle, JSON largest — which matters directly, because most SIEMs bill by ingested volume."
+        },
+        {
+          "title": "Nesting support",
+          "desc": "Only JSON. CEF and syslog are flat, so structured data has to be flattened into extra fields."
+        },
+        {
+          "title": "Normalization",
+          "desc": "Whatever arrives, the SIEM maps it into one common schema so that source IP is a single searchable field across every product."
+        }
+      ]
+    },
+    {
+      "id": "siem",
+      "tag": "S1",
+      "title": "SIEM",
+      "sub": "The platform",
+      "desc": "Security Information and Event Management — the merger of SIM (collection, storage, reporting) and SEM (real-time monitoring and alerting). It exists because EDR sees one endpoint and NDR sees the network, while an attack crosses both.",
+      "children": [
+        {
+          "title": "Collection",
+          "desc": "Pulls logs from firewalls, endpoints, AD, applications, and cloud into one place."
+        },
+        {
+          "title": "Normalization",
+          "desc": "Maps every format onto a shared schema, so one query works across sources that disagree about field names."
+        },
+        {
+          "title": "Correlation",
+          "desc": "The real value. Individually meaningless events combine into meaning: a connection, then fifty failed logins, then one success, then that account touching a server it has never used."
+        },
+        {
+          "title": "Alerting",
+          "desc": "Rules fire when a pattern matches. Logging without alerting is the specific failure OWASP renamed A09 to highlight in 2025."
+        },
+        {
+          "title": "Retention & compliance",
+          "desc": "Searchable history for investigation, and the evidence trail regulators require."
+        },
+        {
+          "title": "The noise problem",
+          "desc": "Tines research found the average SOC analyst received 4,484 alerts a day in 2025, and 67% went uninvestigated. Tuning is not optional."
+        }
+      ]
+    },
+    {
+      "id": "funnel",
+      "tag": "S2",
+      "title": "Event → Incident",
+      "sub": "The funnel",
+      "desc": "Four terms that are often used loosely but describe a funnel: volume falls at each stage while meaning rises. Most of a junior analyst's day is spent at the third step deciding whether to move to the fourth.",
+      "children": [
+        {
+          "title": "Event",
+          "desc": "Anything that happens on a system. It need not even be recorded — and an event that is never logged effectively did not happen, as far as the SOC is concerned."
+        },
+        {
+          "title": "Log",
+          "desc": "An event that was written down and stored. Which events become logs is a configuration decision made long before the incident."
+        },
+        {
+          "title": "Alert",
+          "desc": "One or more logs that matched a rule or threshold and were raised for attention."
+        },
+        {
+          "title": "Incident",
+          "desc": "An alert that investigation confirmed to be a real security event. Not every alert becomes one — closing false positives correctly is as much the job as escalating true ones."
+        },
+        {
+          "title": "Triage",
+          "desc": "The decision step between alert and incident: gather context, judge true or false positive, escalate or close with a reason."
+        },
+        {
+          "title": "After escalation",
+          "desc": "Incident response begins — containment (such as isolating the host via EDR), eradication, recovery, and lessons learned."
+        }
+      ]
+    },
+    {
+      "id": "splunk",
+      "tag": "P1",
+      "title": "Splunk",
+      "sub": "Platform & SPL",
+      "desc": "A general-purpose machine-data platform, not only a security tool. The security product on top is Splunk Enterprise Security. Its query language, SPL, chains commands with pipes.",
+      "children": [
+        {
+          "title": "Forwarder",
+          "desc": "The lightweight agent on each host that ships logs onward to an indexer."
+        },
+        {
+          "title": "Indexer",
+          "desc": "Parses incoming data, assigns timestamps and metadata, indexes and stores it."
+        },
+        {
+          "title": "Search Head",
+          "desc": "Where SPL queries run and dashboards live — the console an analyst actually works in."
+        },
+        {
+          "title": "SPL",
+          "desc": "Pipe-chained query language: select an index, filter, aggregate with stats, filter again with where, then sort. Conceptually close to a PowerShell pipeline."
+        },
+        {
+          "title": "Enterprise Security",
+          "desc": "Adds prebuilt correlation searches, notable events, the incident review screen, risk-based alerting, and MITRE ATT&CK mapping."
+        },
+        {
+          "title": "BOTS datasets",
+          "desc": "Boss of the SOC — Splunk's free, public attack-scenario datasets. The practical way to learn SPL on realistic data."
+        }
+      ]
+    },
+    {
+      "id": "splunk-meta",
+      "tag": "P2",
+      "title": "index · source · sourcetype",
+      "sub": "Splunk metadata",
+      "desc": "The metadata Splunk attaches to every event so it knows where data came from and how to read it. Getting these three straight is what separates a fast query from a slow one.",
+      "children": [
+        {
+          "title": "index",
+          "desc": "Where the data is physically stored — a partition in the data store. Drives search performance, access control, and retention period. Start almost every search with it."
+        },
+        {
+          "title": "source",
+          "desc": "The specific origin: a full file path or input point, such as a web server's access.log or a syslog port."
+        },
+        {
+          "title": "sourcetype",
+          "desc": "The data's format, and the most important of the three — it tells Splunk how to parse the event: where the timestamp sits, how fields are extracted, where a line ends."
+        },
+        {
+          "title": "host",
+          "desc": "Which machine the event came from. The fourth default metadata field alongside the other three."
+        },
+        {
+          "title": "Worked example",
+          "desc": "Two nginx servers share one index and one sourcetype but differ by host. Add the same server's error log and index stays the same while source and sourcetype both change, because the format differs."
+        },
+        {
+          "title": "Query hygiene",
+          "desc": "Always narrow by index and sourcetype first. Searching with index=* is slow and frowned on for the license and resource cost it incurs."
+        }
+      ]
+    },
+    {
+      "id": "other-siem",
+      "tag": "P3",
+      "title": "Other SIEM Products",
+      "sub": "Market",
+      "desc": "The vendors you will hear named alongside Splunk. Worth knowing the shape of the market, including how much of it changed hands recently.",
+      "children": [
+        {
+          "title": "Microsoft Sentinel",
+          "desc": "Cloud-native on Azure, strongest fit where the estate is already Microsoft and Defender-heavy."
+        },
+        {
+          "title": "IBM QRadar",
+          "desc": "Long established in regulated and banking environments; IBM sold its SaaS assets to Palo Alto Networks in 2024."
+        },
+        {
+          "title": "Elastic Security",
+          "desc": "Built on the ELK stack, open-source foundation and lower cost per GB."
+        },
+        {
+          "title": "Falcon Next-Gen SIEM",
+          "desc": "CrowdStrike's LogScale-based SIEM — module M8 on the Falcon map, ingesting third-party sources alongside Falcon's own telemetry."
+        },
+        {
+          "title": "Google SecOps (Chronicle)",
+          "desc": "Built for very high ingestion volume with long hot retention."
+        },
+        {
+          "title": "Open-source options",
+          "desc": "Wazuh and Graylog — the practical route to building a home lab and feeding it Sysmon data."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/6jgWFMyt81S91iWX1xfAjc"
+}

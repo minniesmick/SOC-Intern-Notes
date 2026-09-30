@@ -1,0 +1,278 @@
+{
+  "id": "containers-k8s",
+  "slug": "containers",
+  "emoji": "📦",
+  "accent": "#3ec5c5",
+  "accentDim": "#16403f",
+  "title": "Containers & Kubernetes Concept Map",
+  "subtitle": "Docker, Kubernetes, and the security layers around them. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. CNI, eBPF, pod, admission…",
+  "rootLabel": "Containers & K8s",
+  "rootTitle": "Containers & Kubernetes",
+  "rootDesc": "Containers package an application with its dependencies and run it isolated on a shared kernel. Kubernetes orchestrates thousands of them across many hosts. Each layer here builds on the one before it — start at the basics and work outward, since the security topics only make sense once the architecture does.",
+  "modules": [
+    {
+      "id": "basics",
+      "tag": "C1",
+      "title": "Container Basics",
+      "sub": "Foundations",
+      "desc": "A container is not a small VM. It is a normal process on the host, fenced off by kernel features — which is exactly why container escape is a meaningful risk and VM escape is a rarer one.",
+      "children": [
+        {
+          "title": "Container vs VM",
+          "desc": "A VM ships its own kernel and boots an OS. A container shares the host kernel and only isolates the process — far lighter, but a weaker boundary."
+        },
+        {
+          "title": "Namespaces",
+          "desc": "The kernel feature that gives a process its own view of PIDs, network, mounts, and users. This is what 'isolation' actually means here."
+        },
+        {
+          "title": "cgroups",
+          "desc": "Control groups — the kernel's limit on how much CPU, memory, and I/O a container may consume. Isolation of resources rather than visibility."
+        },
+        {
+          "title": "Image layers",
+          "desc": "An image is a stack of read-only layers with a thin writable layer on top at runtime. Deleted files in an upper layer still exist in the layers below — which is how secrets leak out of images."
+        }
+      ]
+    },
+    {
+      "id": "docker",
+      "tag": "C2",
+      "title": "Docker Architecture",
+      "sub": "Engine",
+      "desc": "The pieces you touch day to day: a client talking to a daemon that builds images and runs containers, pulling from and pushing to registries.",
+      "children": [
+        {
+          "title": "Image",
+          "desc": "The immutable template — filesystem plus metadata. Built once, run anywhere."
+        },
+        {
+          "title": "Container",
+          "desc": "A running instance of an image, with its own writable layer that disappears when the container does."
+        },
+        {
+          "title": "Dockerfile",
+          "desc": "The build recipe. Each instruction creates a layer, which is why secrets passed as build arguments end up baked into history."
+        },
+        {
+          "title": "Registry",
+          "desc": "Where images are stored and distributed — Docker Hub publicly, or a private registry in an enterprise."
+        },
+        {
+          "title": "Docker daemon & socket",
+          "desc": "The privileged process doing the real work. Mounting its socket into a container is effectively handing that container root on the host."
+        }
+      ]
+    },
+    {
+      "id": "standards",
+      "tag": "C3",
+      "title": "Runtime Standards",
+      "sub": "OCI / CRI",
+      "desc": "The specifications that let different tools interoperate. None of these are products — they are contracts that products implement.",
+      "children": [
+        {
+          "title": "OCI",
+          "desc": "Open Container Initiative — standardizes how an image is built and how a container is run. Implemented by runc and crun."
+        },
+        {
+          "title": "CRI",
+          "desc": "Container Runtime Interface — how kubelet talks to a runtime. Implemented by containerd and CRI-O."
+        },
+        {
+          "title": "CNI",
+          "desc": "Container Network Interface — how a pod gets attached to the network. Implemented by Calico, Cilium, and Flannel. Covered in its own module below."
+        }
+      ]
+    },
+    {
+      "id": "k8s-objects",
+      "tag": "K1",
+      "title": "Kubernetes Objects",
+      "sub": "What you deploy",
+      "desc": "The building blocks you write in YAML. Kubernetes is declarative: you describe the desired state, and controllers work to make reality match it.",
+      "children": [
+        {
+          "title": "Pod",
+          "desc": "The smallest deployable unit — one or more containers sharing a network namespace and storage. Containers in the same pod reach each other on localhost."
+        },
+        {
+          "title": "Deployment / ReplicaSet",
+          "desc": "Keeps a stated number of pod replicas running and handles rolling updates."
+        },
+        {
+          "title": "Service",
+          "desc": "A stable network identity and DNS name in front of a changing set of pods. ClusterIP internally, NodePort or LoadBalancer to expose externally."
+        },
+        {
+          "title": "Namespace",
+          "desc": "A logical partition of the cluster — the boundary most RBAC rules and quotas are scoped to."
+        },
+        {
+          "title": "ConfigMap & Secret",
+          "desc": "Configuration and credentials injected at runtime. Secrets are only base64-encoded by default, not encrypted — encryption at rest must be enabled deliberately."
+        }
+      ]
+    },
+    {
+      "id": "control-plane",
+      "tag": "K2",
+      "title": "Control Plane",
+      "sub": "The brain",
+      "desc": "The components that run the cluster. Compromise of the control plane is compromise of everything running on it, which is why its endpoints and credentials matter more than any single workload.",
+      "children": [
+        {
+          "title": "API server",
+          "desc": "The single front door — every request, human or machine, goes through it. Authentication, authorization, and admission all happen here."
+        },
+        {
+          "title": "etcd",
+          "desc": "The key-value store holding all cluster state, including Secrets. Read access to etcd is read access to every credential in the cluster."
+        },
+        {
+          "title": "Scheduler",
+          "desc": "Decides which node each new pod lands on, based on resources, affinity, and taints."
+        },
+        {
+          "title": "Controller manager",
+          "desc": "Runs the reconciliation loops that drive actual state toward declared state."
+        },
+        {
+          "title": "kubelet",
+          "desc": "The agent on each node that actually starts containers and reports back. It calls the CNI plugin when a pod needs network."
+        }
+      ]
+    },
+    {
+      "id": "cni",
+      "tag": "K3",
+      "title": "Networking — CNI",
+      "sub": "Pod connectivity",
+      "desc": "CNI is a specification, not a product: the contract for how a runtime attaches a pod to the network. The plugin assigns the IP and wires the pod up; it does not decide policy on its own.",
+      "children": [
+        {
+          "title": "IPAM",
+          "desc": "IP Address Management — giving every pod a unique address without collisions. Usually from a private cluster range."
+        },
+        {
+          "title": "veth pairs",
+          "desc": "The virtual cable: one end inside the pod's network namespace, the other on the host, bridged onward."
+        },
+        {
+          "title": "Overlay vs native routing",
+          "desc": "Cross-node traffic either travels through an encapsulated tunnel (VXLAN, as Flannel does) or is routed natively (BGP, as Calico can)."
+        },
+        {
+          "title": "Calico",
+          "desc": "The enterprise default — native routing, strong NetworkPolicy support, mature and widely deployed."
+        },
+        {
+          "title": "Cilium",
+          "desc": "eBPF-based, filtering traffic inside the kernel instead of via iptables. Policy down to L7 (HTTP) and deep observability through Hubble — the most interesting one for a SOC."
+        }
+      ]
+    },
+    {
+      "id": "policy",
+      "tag": "K4",
+      "title": "Policy & Access Control",
+      "sub": "Guardrails",
+      "desc": "Who may do what in the cluster, which pod may talk to which, and what is allowed to be admitted at all. Missing policy here is what turns one compromised pod into a cluster-wide incident.",
+      "children": [
+        {
+          "title": "RBAC",
+          "desc": "Role-Based Access Control on the API server. Over-broad roles — especially cluster-admin handed out casually — are the most common finding in a cluster review."
+        },
+        {
+          "title": "NetworkPolicy",
+          "desc": "Declares which pods may reach which. Without it, every pod can talk to every other pod: the easiest lateral movement path there is. You write the rule; the CNI enforces it."
+        },
+        {
+          "title": "Admission controllers",
+          "desc": "Intercept requests after authentication but before persistence — the gate that can reject a non-compliant workload outright. OPA/Gatekeeper and Kyverno are the policy engines used here."
+        },
+        {
+          "title": "Pod Security Standards",
+          "desc": "The successor to PodSecurityPolicy. Three profiles — privileged, baseline, restricted — applied per namespace."
+        },
+        {
+          "title": "Service accounts",
+          "desc": "The identity a pod uses against the API server. Auto-mounted tokens on a compromised pod are a direct route deeper into the cluster."
+        }
+      ]
+    },
+    {
+      "id": "image-sec",
+      "tag": "S1",
+      "title": "Image & Supply Chain",
+      "sub": "Build-time",
+      "desc": "Most container compromise starts before runtime — in what was built, what it was built from, and whether anyone verified it. Maps directly to OWASP A03.",
+      "children": [
+        {
+          "title": "Image scanning",
+          "desc": "Trivy, Grype, and Clair check image layers against vulnerability databases. Run in CI, not just once at deploy."
+        },
+        {
+          "title": "Minimal / distroless base",
+          "desc": "The smaller the base image, the smaller the attack surface and the fewer CVEs to triage. No shell means no shell for an attacker either."
+        },
+        {
+          "title": "Image signing",
+          "desc": "Cosign and Notary sign images so the cluster can verify provenance — paired with an admission rule that rejects unsigned images."
+        },
+        {
+          "title": "Private registry",
+          "desc": "Controlling where images come from, rather than pulling arbitrary public tags into production."
+        }
+      ]
+    },
+    {
+      "id": "runtime-sec",
+      "tag": "S2",
+      "title": "Runtime Security",
+      "sub": "Detection",
+      "desc": "Watching what containers actually do once running, and constraining what they are permitted to do. This is where container security meets the SOC.",
+      "children": [
+        {
+          "title": "eBPF",
+          "desc": "Runs sandboxed programs inside the kernel without loading a module — a verifier checks them first. The engine under Cilium, Falco, and Tetragon; syscall-level visibility that a process cannot evade."
+        },
+        {
+          "title": "Falco",
+          "desc": "Runtime threat detection built on eBPF — alerts on suspicious syscall behavior like a shell spawning inside a container."
+        },
+        {
+          "title": "seccomp / AppArmor / SELinux",
+          "desc": "Kernel-level profiles restricting which syscalls and files a container may touch. Deny by default beats detect after the fact."
+        },
+        {
+          "title": "Privileged containers",
+          "desc": "A privileged container, or one granted CAP_SYS_ADMIN, has effectively dissolved the boundary with the host."
+        },
+        {
+          "title": "Container escape",
+          "desc": "Breaking out to the host — via a mounted Docker socket, a kernel exploit, or over-granted capabilities. The outcome every other control here exists to prevent."
+        }
+      ]
+    },
+    {
+      "id": "sandboxing",
+      "tag": "S3",
+      "title": "Sandboxing",
+      "sub": "Stronger isolation",
+      "desc": "When shared-kernel isolation is not enough — running untrusted or multi-tenant workloads with a real boundary underneath, at some cost in performance.",
+      "children": [
+        {
+          "title": "gVisor",
+          "desc": "Intercepts syscalls in a user-space kernel, so the container never talks to the host kernel directly."
+        },
+        {
+          "title": "Kata Containers",
+          "desc": "Runs each container inside a lightweight VM — VM-grade isolation with a container-shaped interface."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/BYYBdXZFUZzWRRCeSeVVBa"
+}

@@ -1,0 +1,312 @@
+{
+  "id": "webapp-vulns",
+  "slug": "webvulns",
+  "emoji": "🕷️",
+  "accent": "#e8a33d",
+  "accentDim": "#4a3318",
+  "title": "Web App Vulnerabilities Concept Map",
+  "subtitle": "The ten vulnerability classes you actually meet in the wild. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. XSS, CSRF, SSTI, LFI…",
+  "rootLabel": "Web App Vulns",
+  "rootTitle": "Web Application Vulnerabilities",
+  "rootDesc": "Where the OWASP Top 10 names root-cause risk categories, this map covers the concrete vulnerability classes — the actual bugs found in tests and exploited in incidents. Each one maps back to an OWASP category and a CWE, and each has a detection angle a SOC can watch for in WAF and application logs. The last module covers how to read an advisory when one lands.",
+  "modules": [
+    {
+      "id": "sqli",
+      "tag": "V1",
+      "title": "SQL Injection",
+      "sub": "→ A05 · CWE-89",
+      "desc": "Input reaches a database query unparameterized, so the attacker's text is parsed as SQL. Low frequency today but high impact: authentication bypass, full table dumps, sometimes code execution on the database host.",
+      "children": [
+        {
+          "title": "Union-based",
+          "desc": "Appending a UNION SELECT to pull data from other tables into the visible response."
+        },
+        {
+          "title": "Blind / boolean",
+          "desc": "No data is returned, so the attacker infers it one bit at a time from how the page responds to true/false conditions."
+        },
+        {
+          "title": "Time-based",
+          "desc": "Same inference, but using deliberate delays as the signal when even the page content gives nothing away."
+        },
+        {
+          "title": "Detection",
+          "desc": "SQL keywords and quote characters in parameters, sudden spikes in 500 errors, or many near-identical requests differing by one character."
+        },
+        {
+          "title": "Defense",
+          "desc": "Parameterized queries everywhere; least-privilege database accounts; never build a query by string concatenation."
+        }
+      ]
+    },
+    {
+      "id": "xss",
+      "tag": "V2",
+      "title": "Cross-Site Scripting",
+      "sub": "→ A05 · CWE-79",
+      "desc": "Attacker-controlled script executes in another user's browser under the application's origin. High frequency, and the usual payoff is session theft or actions performed as the victim.",
+      "children": [
+        {
+          "title": "Stored",
+          "desc": "The payload is saved server-side (a comment, a profile field) and fires for every user who views it. The most damaging variant."
+        },
+        {
+          "title": "Reflected",
+          "desc": "The payload rides in the request and comes straight back in the response — needs the victim to click a crafted link."
+        },
+        {
+          "title": "DOM-based",
+          "desc": "Never touches the server; client-side JavaScript writes untrusted input into the DOM unsafely."
+        },
+        {
+          "title": "Detection",
+          "desc": "Script tags and event handlers in parameters, unusual outbound requests carrying cookie values."
+        },
+        {
+          "title": "Defense",
+          "desc": "Context-aware output encoding, a strict Content-Security-Policy, and HttpOnly cookies so script cannot read the session."
+        }
+      ]
+    },
+    {
+      "id": "idor",
+      "tag": "V3",
+      "title": "IDOR / Broken Object Access",
+      "sub": "→ A01 · CWE-639",
+      "desc": "An object reference — an id, filename, or account number — is accepted without checking that this user may access it. Trivial to exploit, and the single most common serious finding in API testing.",
+      "children": [
+        {
+          "title": "Sequential IDs",
+          "desc": "Incrementing a numeric id in a URL and walking through other users' records one by one."
+        },
+        {
+          "title": "Mass assignment",
+          "desc": "Sending extra fields (role, isAdmin, balance) that the server binds to the object without filtering."
+        },
+        {
+          "title": "Detection",
+          "desc": "One session enumerating many distinct object ids in a short window — a pattern that stands out clearly in application logs."
+        },
+        {
+          "title": "Defense",
+          "desc": "Check ownership server-side on every object access; prefer unguessable identifiers, but never rely on them as the control."
+        }
+      ]
+    },
+    {
+      "id": "ssrf",
+      "tag": "V4",
+      "title": "Server-Side Request Forgery",
+      "sub": "→ A01 · CWE-918",
+      "desc": "The application fetches a URL supplied by the user, so the attacker makes the server issue requests on their behalf — from inside the network perimeter. Folded into Broken Access Control in the 2025 Top 10.",
+      "children": [
+        {
+          "title": "Cloud metadata access",
+          "desc": "Pointing the server at its own cloud metadata endpoint to steal instance credentials and IAM tokens."
+        },
+        {
+          "title": "Internal port scanning",
+          "desc": "Using response timing and error differences to map services that are not reachable from outside."
+        },
+        {
+          "title": "Detection",
+          "desc": "Outbound requests from an application server to internal ranges or metadata addresses it has no business reaching."
+        },
+        {
+          "title": "Defense",
+          "desc": "Allow-list destinations, block link-local and internal ranges at egress, and require authentication on internal services."
+        }
+      ]
+    },
+    {
+      "id": "csrf",
+      "tag": "V5",
+      "title": "Cross-Site Request Forgery",
+      "sub": "→ A01 · CWE-352",
+      "desc": "A victim's browser is tricked into sending an authenticated state-changing request to an application where they are already logged in — the request is genuine, the intent is not.",
+      "children": [
+        {
+          "title": "Forced state change",
+          "desc": "A password change, transfer, or settings update fired from an attacker's page using the victim's live session."
+        },
+        {
+          "title": "Defense",
+          "desc": "Anti-CSRF tokens tied to the session, SameSite cookie attributes, and re-authentication for high-value actions."
+        }
+      ]
+    },
+    {
+      "id": "authbypass",
+      "tag": "V6",
+      "title": "Authentication Bypass",
+      "sub": "→ A07 · CWE-287",
+      "desc": "Reaching an authenticated context without valid credentials — through a flawed token, a skipped step, or a logic hole in the login flow.",
+      "children": [
+        {
+          "title": "JWT tampering",
+          "desc": "Changing the algorithm to 'none' or exploiting a server that decodes a token without verifying its signature."
+        },
+        {
+          "title": "Session fixation",
+          "desc": "Forcing a known session identifier on the victim before login, then reusing it afterward."
+        },
+        {
+          "title": "Forced browsing",
+          "desc": "Navigating straight to a post-login URL that was only ever hidden, never protected."
+        },
+        {
+          "title": "Detection",
+          "desc": "Successful access with malformed or unsigned tokens; sessions used from two distant locations at once."
+        }
+      ]
+    },
+    {
+      "id": "fileupload",
+      "tag": "V7",
+      "title": "Insecure File Upload",
+      "sub": "→ A06 · CWE-434",
+      "desc": "An upload feature accepts a file it shouldn't, or stores it somewhere it can be executed. The shortest path from a web bug to code running on the server.",
+      "children": [
+        {
+          "title": "Web shell upload",
+          "desc": "Uploading a script file into a web-served directory and then requesting it, giving command execution."
+        },
+        {
+          "title": "Content-type spoofing",
+          "desc": "Faking the declared type or extension to get past a check that trusts what the client claims."
+        },
+        {
+          "title": "Defense",
+          "desc": "Validate by content not extension, store outside the web root, rename on save, and serve downloads through a handler."
+        }
+      ]
+    },
+    {
+      "id": "traversal",
+      "tag": "V8",
+      "title": "Path Traversal / LFI",
+      "sub": "→ A01 · CWE-22",
+      "desc": "A file path built from user input escapes its intended directory, letting an attacker read — and sometimes include and execute — files elsewhere on the host.",
+      "children": [
+        {
+          "title": "Directory traversal",
+          "desc": "Sequences like ../ walking up out of the intended folder to reach configuration files, keys, or password files."
+        },
+        {
+          "title": "Local File Inclusion",
+          "desc": "The traversed file is not just read but included and interpreted, which can escalate to code execution."
+        },
+        {
+          "title": "Detection",
+          "desc": "Traversal sequences or encoded variants in path parameters; application reads of files far outside its own tree."
+        }
+      ]
+    },
+    {
+      "id": "ssti",
+      "tag": "V9",
+      "title": "SSTI & Deserialization",
+      "sub": "→ A05/A08 · CWE-1336/502",
+      "desc": "Two different bugs with the same ending: untrusted input is handed to something that evaluates it, and the attacker gets code execution on the server.",
+      "children": [
+        {
+          "title": "Server-Side Template Injection",
+          "desc": "User input placed into a template that is then rendered, so template syntax in the input is evaluated."
+        },
+        {
+          "title": "Insecure deserialization",
+          "desc": "Serialized objects from an untrusted source are reconstructed, triggering gadget chains that run attacker code."
+        },
+        {
+          "title": "Defense",
+          "desc": "Never render user input as a template; accept only signed or schema-validated serialized data, or use plain data formats instead."
+        }
+      ]
+    },
+    {
+      "id": "misconfig",
+      "tag": "V10",
+      "title": "Exposed Config & Secrets",
+      "sub": "→ A02 · CWE-16",
+      "desc": "Nothing is injected and nothing is bypassed — the information was simply left reachable. Consistently among the first things an attacker checks, and among the easiest to fix.",
+      "children": [
+        {
+          "title": "Exposed .git / backups",
+          "desc": "Source repositories, database dumps, or editor backup files left served by the web server."
+        },
+        {
+          "title": "Leaked API keys",
+          "desc": "Secrets in client-side JavaScript, public repositories, or error output."
+        },
+        {
+          "title": "Open admin panels",
+          "desc": "Management interfaces reachable from the internet, often still on default credentials."
+        },
+        {
+          "title": "Detection",
+          "desc": "Requests probing for well-known sensitive paths — a steady background pattern in any internet-facing web log."
+        }
+      ]
+    },
+    {
+      "id": "smuggling",
+      "tag": "V11",
+      "title": "HTTP Request Smuggling",
+      "sub": "→ A05 · CWE-444",
+      "desc": "Two servers in a chain — a proxy, load balancer, or WAF in front and the application server behind — disagree on where one HTTP request ends and the next begins. The attacker exploits that disagreement to smuggle a second request past the front-end's checks. Exactly the flaw behind CVE-2026-88773 in the Citrix NetScaler bulletin.",
+      "children": [
+        {
+          "title": "CL.TE / TE.CL",
+          "desc": "The classic variants: one server trusts the Content-Length header, the other trusts Transfer-Encoding. The mismatch leaves part of the attacker's body sitting at the front of the next request."
+        },
+        {
+          "title": "Front-end control bypass",
+          "desc": "The smuggled request never passes the front-end's authentication, routing, or WAF rules — it is already inside when the back-end parses it."
+        },
+        {
+          "title": "Request poisoning",
+          "desc": "The smuggled fragment prepends onto another user's request, so a victim receives the attacker's response or performs an action they never made."
+        },
+        {
+          "title": "Where it appears",
+          "desc": "Anywhere there is a proxy chain — CDNs, reverse proxies, and edge appliances like NetScaler that terminate and re-issue HTTP."
+        },
+        {
+          "title": "Defense",
+          "desc": "Normalize requests at the edge, reject those carrying both Content-Length and Transfer-Encoding, and use HTTP/2 end to end where possible."
+        }
+      ]
+    },
+    {
+      "id": "reading-cves",
+      "tag": "R1",
+      "title": "Reading CVEs",
+      "sub": "CWE & CVSS",
+      "desc": "How to judge whether an advisory is an emergency or a Monday task. The score alone rarely tells you; the vector and the preconditions do.",
+      "children": [
+        {
+          "title": "CVE vs CWE",
+          "desc": "A CVE is one specific vulnerability in one product. A CWE is the weakness class it belongs to — and OWASP categories are built out of CWEs, which is how an advisory maps back to what you already know."
+        },
+        {
+          "title": "CVSS vector",
+          "desc": "Read the vector, not just the number. AV:N means reachable over the network, AC:L means easy, PR:N means no credentials needed, UI:N means no victim action required. All four together is the worst case."
+        },
+        {
+          "title": "Preconditions",
+          "desc": "A high score with a narrow precondition may not touch you at all; a slightly lower score that applies to the default configuration probably does. Always check which of your appliances actually meet the condition."
+        },
+        {
+          "title": "CISA KEV",
+          "desc": "The Known Exploited Vulnerabilities catalog — a CVE listed there is confirmed exploited in the wild, which outranks any score when deciding what to patch first."
+        },
+        {
+          "title": "Patch is not enough",
+          "desc": "If an internet-facing device was exploited before the fix, the attacker may already have a webshell, stolen session, or persistence. Patching closes the door; it does not evict anyone already inside."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/YP4t8VjEhPQgV39qXskeoX"
+}

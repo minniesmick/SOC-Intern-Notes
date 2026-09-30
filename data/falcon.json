@@ -1,0 +1,156 @@
+{
+  "id": "falcon",
+  "slug": "falcon",
+  "emoji": "🦅",
+  "accent": "#e0333f",
+  "accentDim": "#4a1b20",
+  "title": "Falcon Concept Map",
+  "subtitle": "From Falcon at the center out to modules, then features. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. process tree, IOA…",
+  "rootLabel": "Falcon",
+  "rootTitle": "CrowdStrike Falcon",
+  "rootDesc": "A cloud-native security platform running on a single, lightweight agent (sensor). Analysis and correlation happen not on the endpoint, but in CrowdStrike's cloud (Threat Graph).",
+  "modules": [
+    {
+      "id": "insight",
+      "tag": "M1",
+      "title": "Falcon Insight",
+      "sub": "EDR / XDR",
+      "desc": "The core of the platform. Continuously monitors process, file, network, and registry events on endpoints; performs behavior-based (IOA) threat detection.",
+      "children": [
+        {
+          "title": "Detections",
+          "desc": "The alert list. Comes with a severity rating (critical/high/medium/low) and a MITRE ATT&CK tactic/technique mapping."
+        },
+        {
+          "title": "Process Tree",
+          "desc": "Visually shows which parent-child process chain triggered a detection."
+        },
+        {
+          "title": "Host Timeline",
+          "desc": "A chronological record of every event that happened on a host over time."
+        },
+        {
+          "title": "IOA vs IOC",
+          "desc": "IOA = behavioral signal. IOC = static artifact (hash, IP, filename). Falcon relies primarily on IOAs."
+        },
+        {
+          "title": "Falcon Score",
+          "desc": "Automatic risk scoring — which alert to look at first."
+        }
+      ]
+    },
+    {
+      "id": "prevent",
+      "tag": "M2",
+      "title": "Falcon Prevent",
+      "sub": "NGAV",
+      "desc": "Next-gen antivirus. Blocks known and unknown malware using machine learning and behavioral rules instead of signatures.",
+      "children": [
+        {
+          "title": "ML-based static analysis",
+          "desc": "Predicts whether a file is malicious using an ML model before it even runs."
+        },
+        {
+          "title": "Behavioral blocking",
+          "desc": "A running process is stopped the moment it shows a malicious behavior pattern."
+        },
+        {
+          "title": "Quarantine",
+          "desc": "A suspicious/malicious file is isolated and cleaned without impacting the system."
+        }
+      ]
+    },
+    {
+      "id": "overwatch",
+      "tag": "M3",
+      "title": "Falcon OverWatch",
+      "sub": "Threat Hunting",
+      "desc": "CrowdStrike's own 24/7 proactive threat hunting service, staffed by human analysts — catches subtle signals that automation misses.",
+      "children": [
+        {
+          "title": "Proactive hunting",
+          "desc": "Actively hunts for threats hiding in the environment, without waiting for an alert."
+        },
+        {
+          "title": "Escalation",
+          "desc": "Reports a suspicious finding directly to your own SOC team."
+        }
+      ]
+    },
+    {
+      "id": "complete",
+      "tag": "M4",
+      "title": "Falcon Complete",
+      "sub": "Managed SOC",
+      "desc": "CrowdStrike handles monitoring and response on your behalf, with SLA guarantees.",
+      "children": [
+        {
+          "title": "SLA-backed response",
+          "desc": "A guaranteed time commitment from detection through to remediation."
+        }
+      ]
+    },
+    {
+      "id": "spotlight",
+      "tag": "M5",
+      "title": "Falcon Spotlight",
+      "sub": "Vuln. Mgmt",
+      "desc": "Detects known vulnerabilities (CVEs) on a system using the same Falcon sensor, with no separate scanning agent needed.",
+      "children": [
+        {
+          "title": "Exploitability prioritization",
+          "desc": "Ranks vulnerabilities by how genuinely likely they are to be exploited."
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "tag": "M6",
+      "title": "Falcon Identity Protection",
+      "sub": "AD / Identity",
+      "desc": "Detects AD and identity-based attacks — catches abnormal authentication behavior via LDAP traffic and credential usage patterns.",
+      "children": [
+        {
+          "title": "Lateral movement detection",
+          "desc": "Catches the pattern of a stolen credential being used across different machines."
+        },
+        {
+          "title": "AD integration",
+          "desc": "Monitors authentication traffic on Domain Controllers in real time."
+        }
+      ]
+    },
+    {
+      "id": "falconx",
+      "tag": "M7",
+      "title": "Falcon X",
+      "sub": "Threat Intel",
+      "desc": "Enriches a detected file/hash/IP with CrowdStrike's global threat intelligence.",
+      "children": [
+        {
+          "title": "Hash / IOC enrichment",
+          "desc": "Places a local detection into global context — where this IOC has been seen before, by whom."
+        }
+      ]
+    },
+    {
+      "id": "siem",
+      "tag": "M8",
+      "title": "Falcon Next-Gen SIEM",
+      "sub": "LogScale",
+      "desc": "A SIEM layer that ingests third-party log sources (firewall, Exchange, IronPort, etc.) and analyzes them with correlation rules.",
+      "children": [
+        {
+          "title": "3rd-party data onboarding",
+          "desc": "Logs from systems outside Falcon can also be piped in here."
+        },
+        {
+          "title": "Fusion SOAR",
+          "desc": "Runs an automated action (playbook) after a detection fires."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/7vA3RB2wV2gWgyQ1VPX37i"
+}

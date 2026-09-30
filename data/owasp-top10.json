@@ -1,0 +1,274 @@
+{
+  "id": "owasp-top10",
+  "slug": "owasp",
+  "emoji": "🔟",
+  "accent": "#9d7cff",
+  "accentDim": "#2e2450",
+  "title": "OWASP Top 10 (2025) Concept Map",
+  "subtitle": "The ten most critical web application security risks, 2025 edition. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. IDOR, supply chain, JWT…",
+  "rootLabel": "OWASP Top 10",
+  "rootTitle": "OWASP Top 10 : 2025",
+  "rootDesc": "The standard awareness document for web application security risks, released November 2025 — the first revision since 2021. Built from 175,000+ CVE records and 248 CWEs across 2.8 million applications, plus a practitioner community survey. Categories are root causes, not symptoms. Two new entries this cycle: Software Supply Chain Failures (A03) and Mishandling of Exceptional Conditions (A10); SSRF was absorbed into A01.",
+  "modules": [
+    {
+      "id": "a01",
+      "tag": "A01",
+      "title": "Broken Access Control",
+      "sub": "#1, was #1",
+      "desc": "Access controls are poorly enforced, letting a user reach data or functions they shouldn't. Top of the list for four editions running; 3.73% of tested applications had at least one of its 40 CWEs. SSRF was folded into this category in 2025.",
+      "children": [
+        {
+          "title": "IDOR / BOLA",
+          "desc": "Insecure Direct Object Reference — changing an id in a URL or request body to read someone else's record. Called BOLA in API terms and now explicitly covered here; the most exploited pattern in API-heavy applications."
+        },
+        {
+          "title": "BFLA",
+          "desc": "Broken Function Level Authorization — a normal user calling an admin-only endpoint that was never checked, just hidden from the UI."
+        },
+        {
+          "title": "SSRF",
+          "desc": "Server-Side Request Forgery — tricking the server into making a request on your behalf, often to internal services or cloud metadata endpoints. Moved into this category in 2025."
+        },
+        {
+          "title": "Privilege escalation",
+          "desc": "Acting as a higher-privileged user by tampering with a token, cookie, or role parameter."
+        },
+        {
+          "title": "Defense",
+          "desc": "Deny by default; enforce authorization server-side on every endpoint, never in the UI; use a framework's access control rather than hand-rolled checks."
+        }
+      ]
+    },
+    {
+      "id": "a02",
+      "tag": "A02",
+      "title": "Security Misconfiguration",
+      "sub": "#2, was #5",
+      "desc": "Up three places — the sharpest climb in 2025. As more application behavior is driven by configuration rather than code, misconfigurations became more prevalent: 3.00% of tested applications had one of its 16 CWEs.",
+      "children": [
+        {
+          "title": "Default credentials",
+          "desc": "Shipped accounts and passwords left unchanged on a service, appliance, or admin panel."
+        },
+        {
+          "title": "Verbose errors",
+          "desc": "Stack traces and debug pages exposed in production, handing an attacker the stack, versions, and internal paths."
+        },
+        {
+          "title": "Unnecessary features",
+          "desc": "Unused ports, services, sample apps, or admin consoles left enabled and reachable."
+        },
+        {
+          "title": "Cloud storage exposure",
+          "desc": "A storage bucket left public — the classic source of mass data leaks."
+        },
+        {
+          "title": "Missing security headers",
+          "desc": "No CSP, HSTS, or frame options, leaving the browser without its defenses."
+        }
+      ]
+    },
+    {
+      "id": "a03",
+      "tag": "A03",
+      "title": "Software Supply Chain Failures",
+      "sub": "#3, NEW",
+      "desc": "New in 2025, expanded from the old 'Vulnerable and Outdated Components'. Covers compromises anywhere in the ecosystem of dependencies, build systems, and distribution infrastructure. Fewest occurrences in the data but the highest average exploit and impact scores — and voted a top concern by the community.",
+      "children": [
+        {
+          "title": "Vulnerable dependencies",
+          "desc": "A known-vulnerable library pulled in directly or transitively, often several levels deep in the tree."
+        },
+        {
+          "title": "Compromised build pipeline",
+          "desc": "The CI/CD system itself is attacked, so malicious code is injected into an otherwise legitimate build."
+        },
+        {
+          "title": "Malicious packages",
+          "desc": "Typosquatted or hijacked packages published to a public registry and pulled in by an unsuspecting developer."
+        },
+        {
+          "title": "Defense",
+          "desc": "Maintain an SBOM, pin and verify dependencies, scan continuously, and sign artifacts so their provenance can be checked."
+        }
+      ]
+    },
+    {
+      "id": "a04",
+      "tag": "A04",
+      "title": "Cryptographic Failures",
+      "sub": "#4, was #2",
+      "desc": "Failures from missing cryptography, weak cryptography, or leaked keys. Down two spots, but still present in 3.80% of tested applications across 32 CWEs. Usually leads to sensitive data exposure.",
+      "children": [
+        {
+          "title": "Cleartext transmission",
+          "desc": "Sensitive data sent without TLS — the reason LDAP on port 389 is a risk signal where LDAPS on 636 is not."
+        },
+        {
+          "title": "Weak algorithms",
+          "desc": "MD5, SHA-1, or DES still in use for hashing or encryption long after they were broken."
+        },
+        {
+          "title": "Hardcoded keys",
+          "desc": "Secrets and keys committed into source code or configuration files."
+        },
+        {
+          "title": "Poor password storage",
+          "desc": "Passwords stored unhashed, or hashed without a salt and a slow algorithm like bcrypt or Argon2."
+        }
+      ]
+    },
+    {
+      "id": "a05",
+      "tag": "A05",
+      "title": "Injection",
+      "sub": "#5, was #3",
+      "desc": "Untrusted input is interpreted as code or commands. Down two spots but the most-tested category, with the largest number of CVEs across its 38 CWEs — ranging from XSS (high frequency, low impact) to SQL injection (low frequency, high impact).",
+      "children": [
+        {
+          "title": "SQL injection",
+          "desc": "Input crafted so the database executes attacker-controlled SQL — data theft, authentication bypass, sometimes full host compromise."
+        },
+        {
+          "title": "Cross-site Scripting",
+          "desc": "Script injected into a page and executed in another user's browser. Counted under Injection since 2021."
+        },
+        {
+          "title": "Command injection",
+          "desc": "Input reaching a shell call, letting an attacker run OS commands on the server."
+        },
+        {
+          "title": "LDAP / NoSQL injection",
+          "desc": "The same class of flaw against directory and document-store queries rather than SQL."
+        },
+        {
+          "title": "Defense",
+          "desc": "Parameterized queries and prepared statements; validate on an allow-list; escape output for the context it lands in."
+        }
+      ]
+    },
+    {
+      "id": "a06",
+      "tag": "A06",
+      "title": "Insecure Design",
+      "sub": "#6, was #4",
+      "desc": "Missing or ineffective control design — a flaw in what was designed, not in how it was coded. Slid two spots as misconfiguration and supply chain leapfrogged it; OWASP notes real industry improvement here since threat modeling became common.",
+      "children": [
+        {
+          "title": "Missing threat modeling",
+          "desc": "The abuse cases were never considered, so no control was designed to stop them."
+        },
+        {
+          "title": "No rate limiting",
+          "desc": "A design that permits unlimited attempts — credential stuffing, enumeration, and brute force all follow."
+        },
+        {
+          "title": "Business logic flaws",
+          "desc": "The application works exactly as coded, but the workflow itself can be abused (skipping a payment step, replaying a discount)."
+        },
+        {
+          "title": "Defense",
+          "desc": "Threat model early, write abuse cases alongside use cases, and use secure design patterns and reference architectures."
+        }
+      ]
+    },
+    {
+      "id": "a07",
+      "tag": "A07",
+      "title": "Authentication Failures",
+      "sub": "#7, renamed",
+      "desc": "An attacker gets the system to accept an invalid or incorrect user as legitimate. Held at #7 with 36 CWEs; renamed from 'Identification and Authentication Failures'. Standardized auth frameworks appear to be reducing occurrences.",
+      "children": [
+        {
+          "title": "Credential stuffing",
+          "desc": "Replaying username/password pairs leaked from other breaches against this application."
+        },
+        {
+          "title": "Weak session management",
+          "desc": "Session IDs that are predictable, never rotated after login, or not invalidated at logout."
+        },
+        {
+          "title": "Broken MFA",
+          "desc": "Multi-factor that can be bypassed, skipped, or defeated by pushing prompts until the user accepts."
+        },
+        {
+          "title": "JWT flaws",
+          "desc": "Tokens accepted without verifying the signature, or with the algorithm set to 'none'."
+        },
+        {
+          "title": "Defense",
+          "desc": "Use a standard authentication framework, enforce MFA, rotate session identifiers, and rate-limit login attempts."
+        }
+      ]
+    },
+    {
+      "id": "a08",
+      "tag": "A08",
+      "title": "Software or Data Integrity Failures",
+      "sub": "#8, stable",
+      "desc": "Failure to maintain trust boundaries and verify the integrity of software, code, and data artifacts — at a lower level than the supply chain category above.",
+      "children": [
+        {
+          "title": "Insecure deserialization",
+          "desc": "Untrusted serialized data is deserialized, which can hand the attacker remote code execution."
+        },
+        {
+          "title": "Unsigned updates",
+          "desc": "An auto-update mechanism that installs code without verifying a signature."
+        },
+        {
+          "title": "Untrusted CDN content",
+          "desc": "Scripts loaded from a third party with no integrity check, so a compromise there becomes a compromise here."
+        }
+      ]
+    },
+    {
+      "id": "a09",
+      "tag": "A09",
+      "title": "Security Logging & Alerting Failures",
+      "sub": "#9, renamed",
+      "desc": "Renamed in 2025 from 'Logging and Monitoring' to stress alerting: great logging with no alerting is of minimal value for identifying incidents. Always underrepresented in test data, so it is voted in by the community survey. This is the SOC's own category.",
+      "children": [
+        {
+          "title": "Missing audit logs",
+          "desc": "Logins, failures, and high-value transactions are never recorded, so an incident cannot be reconstructed."
+        },
+        {
+          "title": "Logs without alerts",
+          "desc": "Events are collected but nothing fires on them — the specific failure this category was renamed to highlight."
+        },
+        {
+          "title": "No integrity protection",
+          "desc": "Logs stored where an attacker can edit or wipe them, destroying the forensic trail."
+        },
+        {
+          "title": "Defense",
+          "desc": "Centralize logs off-host in a SIEM, alert on meaningful patterns, and make the log store append-only."
+        }
+      ]
+    },
+    {
+      "id": "a10",
+      "tag": "A10",
+      "title": "Mishandling of Exceptional Conditions",
+      "sub": "#10, NEW",
+      "desc": "New in 2025, with 24 CWEs. Software fails to prevent, detect, or respond to unusual situations — it doesn't stop the abnormal condition, doesn't notice it happening, or responds badly afterward. Leads to crashes, unexpected behavior, and exploitable states.",
+      "children": [
+        {
+          "title": "Failing open",
+          "desc": "When a check errors out, the code proceeds as if it passed — a denied request becomes an allowed one."
+        },
+        {
+          "title": "Improper error handling",
+          "desc": "Exceptions swallowed silently or handled in a way that leaves the system in an inconsistent state."
+        },
+        {
+          "title": "Logic errors under load",
+          "desc": "Race conditions and edge cases that only appear when the system is under stress or hit concurrently."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/Tsa7hjCaBo2a7S3cYRwxQo"
+}

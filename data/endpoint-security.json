@@ -1,0 +1,231 @@
+{
+  "id": "endpoint-security",
+  "slug": "endpoint",
+  "emoji": "🛡️",
+  "accent": "#4a9eff",
+  "accentDim": "#16304d",
+  "title": "Endpoint Security Concept Map",
+  "subtitle": "Attack stages and defensive layers around the endpoint. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. LOLBins, LSASS, EDR…",
+  "rootLabel": "Endpoint Security",
+  "rootTitle": "Endpoint Security",
+  "rootDesc": "Protecting every device that connects to the network — laptops, desktops, servers, mobiles, IoT — from being the attacker's initial access point or persistence foothold. Most SOC alerts originate here.",
+  "modules": [
+    {
+      "id": "initial-access",
+      "tag": "T1",
+      "title": "Initial Access",
+      "sub": "Entry",
+      "desc": "The method by which an attacker first gets into the network or onto an endpoint.",
+      "children": [
+        {
+          "title": "Phishing (T1566)",
+          "desc": "The most common entry path — a malicious attachment or link delivered by email. Mail gateways (e.g. IronPort) sit in front of Exchange to filter these."
+        },
+        {
+          "title": "Exploited vulnerability",
+          "desc": "An unpatched CVE in an internet-facing service or client application is abused to gain code execution."
+        },
+        {
+          "title": "Valid Accounts (T1078)",
+          "desc": "Logging in with stolen or leaked credentials. Looks like legitimate activity, which is what makes it hard to catch."
+        }
+      ]
+    },
+    {
+      "id": "execution",
+      "tag": "T2",
+      "title": "Execution",
+      "sub": "Run code",
+      "desc": "Getting code or commands to actually run on the target system.",
+      "children": [
+        {
+          "title": "PowerShell (T1059.001)",
+          "desc": "A legitimate Windows tool abused for most fileless attacks — no file dropped to disk, so signature-based AV misses it."
+        },
+        {
+          "title": "Malicious macro",
+          "desc": "Office document macros that pull down and run the next stage of the payload."
+        }
+      ]
+    },
+    {
+      "id": "persistence",
+      "tag": "T3",
+      "title": "Persistence",
+      "sub": "Stay resident",
+      "desc": "Techniques that keep the attacker on the system across reboots and logouts.",
+      "children": [
+        {
+          "title": "Scheduled Task (T1053)",
+          "desc": "The classic route — a task that re-launches the payload on a schedule or at startup."
+        },
+        {
+          "title": "Registry Run keys",
+          "desc": "Entries that make Windows launch the payload automatically at each login."
+        },
+        {
+          "title": "Service creation",
+          "desc": "Registering the payload as a Windows service so it starts with the system, often with SYSTEM privileges."
+        }
+      ]
+    },
+    {
+      "id": "privesc",
+      "tag": "T4",
+      "title": "Privilege Escalation",
+      "sub": "Gain rights",
+      "desc": "Moving from a low-privileged account or process up to admin/SYSTEM, usually by abusing a vulnerability or a misconfiguration.",
+      "children": [
+        {
+          "title": "Kernel / local exploit",
+          "desc": "Abusing an unpatched local vulnerability to jump straight to SYSTEM."
+        },
+        {
+          "title": "Misconfiguration abuse",
+          "desc": "Weak service permissions, writable paths, or over-permissive rights handed to a normal user."
+        }
+      ]
+    },
+    {
+      "id": "evasion",
+      "tag": "T5",
+      "title": "Defense Evasion",
+      "sub": "Stay hidden",
+      "desc": "The umbrella set of techniques for avoiding AV/EDR detection.",
+      "children": [
+        {
+          "title": "Process Injection (T1055)",
+          "desc": "Malicious code is injected into a legitimate system process (explorer.exe, svchost.exe) rather than running standalone — enabling C2 activity without tripping filters."
+        },
+        {
+          "title": "LOLBins / Fileless",
+          "desc": "Living-off-the-Land Binaries — abusing built-in, signed Windows tools (PowerShell, WMI, mshta) so nothing malicious is ever written to disk."
+        },
+        {
+          "title": "Log clearing",
+          "desc": "Deleting or tampering with event logs to destroy the forensic trail."
+        }
+      ]
+    },
+    {
+      "id": "credaccess",
+      "tag": "T6",
+      "title": "Credential Access",
+      "sub": "Steal secrets",
+      "desc": "Stealing passwords and hashes held in memory or on disk — this is what fuels lateral movement.",
+      "children": [
+        {
+          "title": "LSASS dumping (T1003.001)",
+          "desc": "Reading credentials out of the LSASS process memory. The core purpose of tools like Mimikatz, and critical in a banking environment."
+        },
+        {
+          "title": "Credential harvesting from disk",
+          "desc": "Pulling saved passwords from browsers, config files, or scripts left on the host."
+        }
+      ]
+    },
+    {
+      "id": "lateral",
+      "tag": "T7",
+      "title": "Lateral Movement",
+      "sub": "Spread",
+      "desc": "Moving from the first compromised machine to other systems — especially domain controllers and file servers.",
+      "children": [
+        {
+          "title": "Pass-the-Hash / Ticket",
+          "desc": "Reusing a stolen hash or Kerberos ticket to authenticate elsewhere without knowing the plaintext password."
+        },
+        {
+          "title": "Remote services abuse",
+          "desc": "Using RDP, SMB shares, or WMI with valid credentials to reach further into the network."
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "tag": "T8",
+      "title": "Command and Control",
+      "sub": "C2",
+      "desc": "The compromised machine communicating with the attacker's remote server to receive commands and return results — usually disguised to look like legitimate traffic.",
+      "children": [
+        {
+          "title": "Beaconing",
+          "desc": "Regular, periodic 'check-in' traffic to an unknown domain or IP — the classic signal NDR tools like Darktrace hunt for."
+        },
+        {
+          "title": "DNS tunneling",
+          "desc": "Hiding C2 traffic inside DNS queries, which are rarely blocked outright."
+        },
+        {
+          "title": "Anomalous process egress",
+          "desc": "A process that should never touch the internet (e.g. notepad.exe) suddenly making outbound connections."
+        }
+      ]
+    },
+    {
+      "id": "exfil",
+      "tag": "T9",
+      "title": "Exfiltration",
+      "sub": "Data out",
+      "desc": "Moving sensitive data out of the target network — via an encrypted channel, DNS tunneling, or cloud storage services.",
+      "children": [
+        {
+          "title": "Encrypted channel",
+          "desc": "Data sent out over HTTPS or another encrypted protocol so inspection is difficult."
+        },
+        {
+          "title": "DLP controls",
+          "desc": "Data Loss Prevention (e.g. Titus) classifies and blocks sensitive data — card numbers, customer records — before it leaves."
+        }
+      ]
+    },
+    {
+      "id": "impact",
+      "tag": "T10",
+      "title": "Impact",
+      "sub": "Damage",
+      "desc": "The final damage stage of an attack.",
+      "children": [
+        {
+          "title": "Ransomware",
+          "desc": "Encrypting data for extortion. Around 90% of ransomware incidents start at the endpoint."
+        },
+        {
+          "title": "Destruction / DoS",
+          "desc": "Wiping data or systems, or causing service outage."
+        }
+      ]
+    },
+    {
+      "id": "controls",
+      "tag": "D1",
+      "title": "Defensive Controls",
+      "sub": "Blue team",
+      "desc": "The protective layers placed on and around the endpoint.",
+      "children": [
+        {
+          "title": "AV → EDR → XDR",
+          "desc": "Signature AV catches known files; EDR watches behavior on one endpoint; XDR correlates endpoint with network, email, and cloud."
+        },
+        {
+          "title": "Application whitelisting",
+          "desc": "Only approved applications may run (e.g. Solidcore) — everything outside the list is blocked by default."
+        },
+        {
+          "title": "Endpoint isolation",
+          "desc": "When a host is judged suspicious, the SOC cuts it off from the network (network containment) while keeping the EDR link alive."
+        },
+        {
+          "title": "Patch management",
+          "desc": "Closing known vulnerabilities before they can be exploited — the cheapest control there is."
+        },
+        {
+          "title": "Least privilege",
+          "desc": "Users and services get only the rights they need, so a compromise has less room to escalate."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/LS7ZvmcA5diWVvcjNikk96"
+}

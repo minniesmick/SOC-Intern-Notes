@@ -1,0 +1,270 @@
+{
+  "id": "cloud-fundamentals",
+  "slug": "cloud",
+  "emoji": "☁️",
+  "accent": "#5b9bf5",
+  "accentDim": "#1b3355",
+  "title": "Cloud Fundamentals Concept Map",
+  "subtitle": "AWS and Azure side by side, with the security layers on top. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. IAM, S3, CNAPP, metadata…",
+  "rootLabel": "Cloud",
+  "rootTitle": "Cloud Architecture & Security",
+  "rootDesc": "AWS and Azure offer the same building blocks under different names: compute, storage, network, identity. Learn the concept once and the vendor mapping is mostly vocabulary. The security layer matters more than the service catalog — almost every cloud breach traces back to identity or configuration, not to a vendor vulnerability.",
+  "modules": [
+    {
+      "id": "models",
+      "tag": "F1",
+      "title": "Service Models",
+      "sub": "Foundations",
+      "desc": "What the provider runs versus what you remain responsible for. Getting this boundary wrong is the root of most cloud incidents.",
+      "children": [
+        {
+          "title": "IaaS / PaaS / SaaS",
+          "desc": "Infrastructure (you manage the OS up), Platform (you manage the app only), Software (you manage configuration and data only)."
+        },
+        {
+          "title": "Shared responsibility",
+          "desc": "The provider secures the cloud; you secure what you put in it. Your data, your identities, and your configuration are always yours."
+        },
+        {
+          "title": "Regions & availability zones",
+          "desc": "Geographic regions hold multiple isolated zones. Relevant to both resilience and data residency — which matters for banking regulation."
+        }
+      ]
+    },
+    {
+      "id": "compute",
+      "tag": "F2",
+      "title": "Compute",
+      "sub": "Running code",
+      "desc": "Where your workloads actually execute, from full virtual machines down to individual functions.",
+      "children": [
+        {
+          "title": "EC2 / Azure VM",
+          "desc": "Rented virtual servers. You pick the OS and manage everything above the hypervisor — including patching."
+        },
+        {
+          "title": "EKS / AKS",
+          "desc": "Managed Kubernetes. The provider runs the control plane; your workloads, RBAC, and network policy are still yours to secure."
+        },
+        {
+          "title": "Lambda / Azure Functions",
+          "desc": "Serverless — code runs on demand with no server to manage. No host to patch, but the function's identity and permissions become the attack surface."
+        },
+        {
+          "title": "Auto-scaling",
+          "desc": "Capacity grows and shrinks automatically. Useful, and also the reason cryptojacking on a compromised account gets expensive fast."
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "tag": "F3",
+      "title": "Storage",
+      "sub": "Holding data",
+      "desc": "Object storage for files and backups, block storage for disks attached to instances.",
+      "children": [
+        {
+          "title": "S3 / Blob Storage",
+          "desc": "Object storage — files live in buckets or containers, each addressable by URL. Cheap, effectively unlimited, and the single most common source of mass data leaks when left public."
+        },
+        {
+          "title": "EBS / Managed Disks",
+          "desc": "Block storage attached to a VM like a physical disk. Snapshots are a quiet risk: a public snapshot exposes the whole volume."
+        },
+        {
+          "title": "Encryption at rest",
+          "desc": "Available on every storage service and usually a regulatory requirement — but it must be switched on and the key ownership decided."
+        },
+        {
+          "title": "Lifecycle & versioning",
+          "desc": "Retention rules and object versions. Versioning is also a partial ransomware defense, since encrypted-over objects can be rolled back."
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "tag": "F4",
+      "title": "Networking",
+      "sub": "Connectivity",
+      "desc": "Your private slice of the provider's network, and the controls deciding what may reach what.",
+      "children": [
+        {
+          "title": "VPC / VNet",
+          "desc": "A logically isolated private network inside the provider, divided into subnets you define."
+        },
+        {
+          "title": "Public vs private subnet",
+          "desc": "Whether resources in that subnet can be reached from the internet. Databases belong in private subnets — a rule broken surprisingly often."
+        },
+        {
+          "title": "Security Groups / NSG",
+          "desc": "Stateful firewall rules attached to instances or subnets. An SSH or RDP port open to 0.0.0.0/0 is the classic finding."
+        },
+        {
+          "title": "Load balancer & gateway",
+          "desc": "Distributes traffic across instances and terminates TLS. The controlled front door to a workload."
+        },
+        {
+          "title": "VPN / Direct Connect",
+          "desc": "Private links joining the cloud network to the on-premise network — how a bank's hybrid setup actually connects."
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "tag": "F5",
+      "title": "Identity & Access",
+      "sub": "IAM",
+      "desc": "Identity is the real perimeter in cloud. Nearly every serious cloud breach is an identity failure — an over-permissive role, a leaked key, a stolen token — rather than an exploited vulnerability.",
+      "children": [
+        {
+          "title": "AWS IAM / Entra ID",
+          "desc": "Users, groups, roles, and policies deciding who may call which API. Entra ID (formerly Azure AD) is also the identity source for Microsoft 365."
+        },
+        {
+          "title": "Roles vs users",
+          "desc": "A role is assumed temporarily and issues short-lived credentials; a user carries long-lived keys. Prefer roles — there is nothing lasting to steal."
+        },
+        {
+          "title": "Least privilege",
+          "desc": "Grant only the permissions actually used. Wildcard policies are the cloud equivalent of handing out domain admin."
+        },
+        {
+          "title": "Instance metadata",
+          "desc": "The endpoint a VM queries for its own credentials. Reachable via SSRF, which is why an application-layer bug becomes a cloud credential theft."
+        },
+        {
+          "title": "Federation & SSO",
+          "desc": "Corporate identity extended into the cloud, so access follows the joiner-mover-leaver process rather than living in local accounts."
+        }
+      ]
+    },
+    {
+      "id": "secrets",
+      "tag": "F6",
+      "title": "Secrets & Keys",
+      "sub": "Credentials",
+      "desc": "Where credentials and encryption keys live, and who can use them.",
+      "children": [
+        {
+          "title": "KMS / Key Vault",
+          "desc": "Managed key storage and cryptographic operations. Keys never leave the service; you call it to encrypt and decrypt."
+        },
+        {
+          "title": "Secrets Manager",
+          "desc": "Storage and automatic rotation for database passwords, API keys, and tokens — instead of a config file in the repository."
+        },
+        {
+          "title": "Hardcoded secrets",
+          "desc": "Keys committed to source or embedded in an image. Public repository scanners find these within minutes of a push."
+        }
+      ]
+    },
+    {
+      "id": "logging",
+      "tag": "F7",
+      "title": "Logging & Monitoring",
+      "sub": "Visibility",
+      "desc": "Your entire audit trail in the cloud. If this is off or unretained, an incident simply cannot be investigated afterward.",
+      "children": [
+        {
+          "title": "CloudTrail / Activity Log",
+          "desc": "Records every API call made in the account — who did what, from where, and when. The first place any cloud investigation starts."
+        },
+        {
+          "title": "CloudWatch / Azure Monitor",
+          "desc": "Metrics, application logs, and alarms from running resources."
+        },
+        {
+          "title": "VPC Flow Logs / NSG Flow Logs",
+          "desc": "Network-level connection records — the cloud equivalent of NetFlow, used to spot C2 and exfiltration."
+        },
+        {
+          "title": "SIEM integration",
+          "desc": "Shipping all of the above into a central SIEM so cloud events correlate with on-premise ones rather than sitting in a separate console."
+        }
+      ]
+    },
+    {
+      "id": "misconfig",
+      "tag": "S1",
+      "title": "Common Misconfigurations",
+      "sub": "What goes wrong",
+      "desc": "The recurring findings behind most cloud incidents. None of these require an exploit — only a setting left wrong.",
+      "children": [
+        {
+          "title": "Public storage bucket",
+          "desc": "Access left open to the world. The cause of countless headline data leaks and still the most common cloud finding."
+        },
+        {
+          "title": "Over-permissive IAM",
+          "desc": "Wildcard actions and resources, or admin attached where read-only would do. Turns any compromise into a total one."
+        },
+        {
+          "title": "Open security groups",
+          "desc": "Management ports exposed to the internet, scanned and brute-forced within minutes of going live."
+        },
+        {
+          "title": "Disabled logging",
+          "desc": "Audit logging switched off or retained for days rather than months, leaving no trail to follow."
+        },
+        {
+          "title": "Unencrypted data",
+          "desc": "Storage or snapshots without encryption at rest — a compliance failure as much as a security one."
+        }
+      ]
+    },
+    {
+      "id": "posture",
+      "tag": "S2",
+      "title": "Posture Management",
+      "sub": "CNAPP",
+      "desc": "The tooling category that continuously checks cloud configuration and workloads against policy. Prisma Cloud is a CNAPP; the acronyms below are its component parts.",
+      "children": [
+        {
+          "title": "CSPM",
+          "desc": "Cloud Security Posture Management — continuously scans configuration for the misconfigurations listed above."
+        },
+        {
+          "title": "CWPP",
+          "desc": "Cloud Workload Protection Platform — protects what runs inside: VMs, containers, and serverless functions."
+        },
+        {
+          "title": "CIEM",
+          "desc": "Cloud Infrastructure Entitlement Management — analyzes permissions to find identities holding far more rights than they use."
+        },
+        {
+          "title": "CNAPP",
+          "desc": "The umbrella combining CSPM, CWPP, CIEM, and container security into one platform. Prisma Cloud is the example you will hear most often."
+        }
+      ]
+    },
+    {
+      "id": "cdr",
+      "tag": "S3",
+      "title": "Cloud Detection & Response",
+      "sub": "CDR",
+      "desc": "Detection focused on cloud runtime — the equivalent of EDR, but for cloud control-plane and workload activity rather than endpoints.",
+      "children": [
+        {
+          "title": "Credential theft via SSRF",
+          "desc": "An application bug used to reach the metadata endpoint and steal the instance's role credentials — then used against the cloud API directly."
+        },
+        {
+          "title": "Cryptojacking",
+          "desc": "Compromised credentials used to spin up expensive compute for mining. Often the first visible sign is the bill."
+        },
+        {
+          "title": "Anomalous API calls",
+          "desc": "A role suddenly enumerating buckets, creating users, or acting from an unusual region — the cloud version of lateral movement."
+        },
+        {
+          "title": "Persistence in cloud",
+          "desc": "New access keys, backdoor IAM users, or lambda functions created to survive the original entry point being closed."
+        }
+      ]
+    }
+  ],
+  "url": "https://claude.ai/artifact/UNVgA4BtiyqTfPtdH5Ly7V"
+}

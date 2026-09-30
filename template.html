@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #171b22;
+    --border: #262c37;
+    --text: #e8eaed;
+    --text-dim: #939aa6;
+    --text-faint: #5b6270;
+    --accent: __ACCENT__;
+    --accent-dim: __ACCENT_DIM__;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); -webkit-font-smoothing: antialiased;
+    min-height: 100%; overscroll-behavior: none;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 20px 14px calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .topbar { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  h1 { font-family: var(--mono); font-size: 1.1rem; font-weight: 600; margin: 0 0 4px; }
+  .back-link { font-family: var(--mono); font-size: 0.72rem; color: var(--text-faint); text-decoration: none; white-space: nowrap; }
+  .back-link:hover { color: var(--accent); }
+  header p { margin: 0; color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+  .toolbar { display: flex; gap: 8px; margin-top: 12px; }
+  .search-box { position: relative; flex: 1; }
+  .search-box input {
+    width: 100%; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px 10px 34px; color: var(--text);
+    font-family: var(--sans); font-size: 0.88rem; outline: none;
+  }
+  .search-box input:focus { border-color: var(--accent); }
+  .search-box > svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--text-faint); }
+  .icon-btn {
+    flex: 0 0 auto; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-dim); width: 40px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .stage {
+    margin-top: 14px;
+    background: radial-gradient(ellipse at center, #14171e 0%, var(--bg) 75%);
+    border: 1px solid var(--border); border-radius: 14px;
+    height: 64vh; min-height: 420px; max-height: 640px;
+    overflow: hidden; position: relative; touch-action: pan-y;
+  }
+  svg#map { width: 100%; height: 100%; display: block; }
+
+  .bubble { cursor: pointer; }
+  .bubble circle { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; transition: fill .15s, stroke .15s; }
+  .bubble.root circle { fill: #1c1216; stroke: var(--accent); stroke-width: 2; }
+  .bubble.module.open circle { stroke: var(--accent); fill: #1a1418; }
+  .bubble.leaf circle { fill: #12151b; }
+  .bubble.leaf.active circle { stroke: var(--accent); }
+  .bubble.leaf { cursor: grab; touch-action: none; }
+  .bubble.leaf.dragging { cursor: grabbing; }
+  .bubble.leaf.dragging circle { stroke: var(--accent); stroke-width: 2; }
+  .bubble.dim { opacity: .18; }
+
+  .bubble .lbl {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    text-align: center; font-family: var(--sans); font-weight: 500; line-height: 1.2;
+    color: var(--text); padding: 4px; pointer-events: none; user-select: none;
+  }
+  .bubble.root .lbl { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .bubble.module .lbl { font-size: 11px; }
+  .bubble.leaf .lbl { font-size: 9.5px; color: var(--text-dim); }
+
+  .lines line { stroke: var(--border); stroke-width: 1.5; }
+  .lines line.active { stroke: var(--accent-dim); }
+
+  .panel {
+    margin-top: 14px; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; min-height: 78px;
+  }
+  .panel .tag { font-family: var(--mono); font-size: .65rem; color: var(--accent); letter-spacing: .03em; }
+  .panel h3 { margin: 4px 0 6px; font-size: 1rem; font-weight: 600; }
+  .panel p { margin: 0; color: var(--text-dim); font-size: .85rem; line-height: 1.55; }
+
+  .toast {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    background: var(--panel); border: 1px solid var(--accent-dim);
+    color: var(--text); font-size: .8rem; padding: 9px 16px; border-radius: 20px;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .toast.show { opacity: 1; }
+
+  footer { margin-top: 16px; text-align: center; color: var(--text-faint); font-size: .72rem; font-family: var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="topbar">
+      <h1>__EMOJI__ __SLUG__ --map</h1>
+      __BACKLINK__
+    </div>
+    <p>__SUBTITLE__</p>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search" type="text" placeholder="Search…">
+      </div>
+      <div class="icon-btn" id="homeBtn" title="Reset view">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      </div>
+      <div class="icon-btn" id="resetPosBtn" title="Reset bubble positions">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <svg id="map" viewBox="-320 -320 640 640">
+      <g class="lines" id="lines"></g>
+      <g id="bubbles"></g>
+    </svg>
+  </div>
+
+  <div class="panel" id="panel"></div>
+  <footer>tap → expand · drag leaves → rearrange · ↺ → reset layout</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script id="map-data" type="application/json">
+__DATA_JSON__
+</script>
+
+<script>
+/* ---------- config (edit only the JSON block above) ---------- */
+const CFG = JSON.parse(document.getElementById("map-data").textContent);
+const DATA = CFG.modules;
+const STORE_KEY = "conceptmap:" + CFG.id + ":positions";
+document.getElementById("search").placeholder = CFG.searchPlaceholder || "Search…";
+
+/* ---------- geometry ---------- */
+const R1 = 190, R2 = 360, ROOT_R = 58, MOD_R = 42, LEAF_R = 36;
+const step = 360 / DATA.length;
+
+DATA.forEach((m, i) => {
+  const baseDeg = -90 + i * step;
+  const a = baseDeg * Math.PI / 180;
+  m.x = R1 * Math.cos(a); m.y = R1 * Math.sin(a);
+  const spreadDeg = Math.min(step * 0.9 + 20, Math.max(30, m.children.length * 22));
+  m.children.forEach((c, j) => {
+    const aDeg = m.children.length === 1 ? baseDeg
+      : (baseDeg - spreadDeg / 2) + (spreadDeg / (m.children.length - 1)) * j;
+    const ra = aDeg * Math.PI / 180;
+    c.homeX = R2 * Math.cos(ra); c.homeY = R2 * Math.sin(ra);
+    c.x = c.homeX; c.y = c.homeY;
+    c.parent = m; c.key = m.id + "/" + j;
+  });
+});
+
+/* ---------- persistence ---------- */
+function loadPositions() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    DATA.forEach(m => m.children.forEach(c => {
+      if (saved[c.key]) { c.x = saved[c.key].x; c.y = saved[c.key].y; }
+    }));
+  } catch (e) { /* storage unavailable — fall back to defaults */ }
+}
+function savePositions() {
+  try {
+    const out = {};
+    DATA.forEach(m => m.children.forEach(c => {
+      if (c.x !== c.homeX || c.y !== c.homeY) out[c.key] = { x: c.x, y: c.y };
+    }));
+    localStorage.setItem(STORE_KEY, JSON.stringify(out));
+  } catch (e) { /* ignore */ }
+}
+function resetPositions() {
+  DATA.forEach(m => m.children.forEach(c => { c.x = c.homeX; c.y = c.homeY; }));
+  try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+  const open = [...openModules.keys()];
+  collapseAll();
+  open.forEach(id => openModuleFn(DATA.find(d => d.id === id)));
+  fitView(openModules.size ? allOpenBox() : overviewBox(), true);
+  toast("Layout reset");
+}
+loadPositions();
+
+/* ---------- build ---------- */
+const svg = document.getElementById("map");
+const linesG = document.getElementById("lines");
+const bubblesG = document.getElementById("bubbles");
+const panel = document.getElementById("panel");
+const NS = "http://www.w3.org/2000/svg";
+
+const svgEl = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+function makeBubble(x, y, r, cls, label, id) {
+  const g = svgEl("g", { class: "bubble " + cls, transform: `translate(${x},${y})`, "data-id": id || "" });
+  g.appendChild(svgEl("circle", { r }));
+  const fo = svgEl("foreignObject", { x: -r + 4, y: -r + 4, width: (r - 4) * 2, height: (r - 4) * 2 });
+  const d = document.createElement("div"); d.className = "lbl"; d.textContent = label;
+  fo.appendChild(d); g.appendChild(fo);
+  return g;
+}
+const makeLine = (x1, y1, x2, y2, cls) => svgEl("line", { x1, y1, x2, y2, class: cls || "" });
+
+const rootBubble = makeBubble(0, 0, ROOT_R, "root", CFG.rootLabel, "root");
+bubblesG.appendChild(rootBubble);
+rootBubble.addEventListener("click", () => {
+  collapseAll(); fitView(overviewBox(), true);
+  showPanel("ROOT", CFG.rootTitle, CFG.rootDesc);
+});
+
+DATA.forEach(m => {
+  linesG.appendChild(makeLine(0, 0, m.x, m.y));
+  const b = makeBubble(m.x, m.y, MOD_R, "module", m.title, m.id);
+  bubblesG.appendChild(b);
+  m.el = b;
+  b.addEventListener("click", () => toggleModule(m));
+});
+
+/* ---------- open / close ---------- */
+const openModules = new Map();
+
+function closeModule(m) {
+  const rec = openModules.get(m.id);
+  if (!rec) return;
+  rec.bubbles.forEach(e => e.remove());
+  rec.lines.forEach(e => e.remove());
+  openModules.delete(m.id);
+  m.el.classList.remove("open");
+}
+
+function toSVGPoint(ev) {
+  const p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
+  return p.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+function makeDraggable(el, c, line) {
+  let dragging = false, moved = false, start = null, sx = 0, sy = 0;
+  el.addEventListener("pointerdown", ev => {
+    ev.stopPropagation(); el.setPointerCapture(ev.pointerId);
+    dragging = true; moved = false; start = toSVGPoint(ev); sx = c.x; sy = c.y;
+    el.classList.add("dragging");
+  });
+  el.addEventListener("pointermove", ev => {
+    if (!dragging) return;
+    const p = toSVGPoint(ev);
+    const dx = p.x - start.x, dy = p.y - start.y;
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+    c.x = sx + dx; c.y = sy + dy;
+    el.setAttribute("transform", `translate(${c.x},${c.y})`);
+    line.setAttribute("x2", c.x); line.setAttribute("y2", c.y);
+  });
+  function end(ev) {
+    if (!dragging) return;
+    dragging = false; el.classList.remove("dragging");
+    try { el.releasePointerCapture(ev.pointerId); } catch (e) {}
+    if (moved) savePositions();
+    else {
+      document.querySelectorAll(".bubble.leaf").forEach(e => e.classList.remove("active"));
+      el.classList.add("active");
+      showPanel(c.parent.tag, c.title, c.desc);
+    }
+  }
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+
+function openModuleFn(m) {
+  m.el.classList.add("open");
+  const bubbles = [], lines = [];
+  m.children.forEach(c => {
+    const line = makeLine(m.x, m.y, c.x, c.y, "active");
+    linesG.appendChild(line); lines.push(line);
+    const b = makeBubble(c.x, c.y, LEAF_R, "leaf", c.title);
+    bubblesG.appendChild(b); bubbles.push(b);
+    makeDraggable(b, c, line);
+  });
+  openModules.set(m.id, { bubbles, lines });
+}
+
+function collapseAll() {
+  [...openModules.keys()].forEach(id => closeModule(DATA.find(d => d.id === id)));
+}
+
+function toggleModule(m) {
+  if (openModules.has(m.id)) {
+    closeModule(m);
+    fitView(openModules.size ? allOpenBox() : overviewBox(), true);
+    showPanel("ROOT", CFG.rootTitle, CFG.rootDesc);
+    return;
+  }
+  openModuleFn(m);
+  fitView(allOpenBox(), true);
+  showPanel(m.tag, m.title + (m.sub ? " · " + m.sub : ""), m.desc);
+}
+
+function showPanel(tag, title, desc) {
+  panel.innerHTML = `<div class="tag">${tag}</div><h3>${title}</h3><p>${desc}</p>`;
+}
+showPanel("ROOT", CFG.rootTitle, CFG.rootDesc);
+
+/* ---------- viewport ---------- */
+function boxOf(pts) {
+  const pad = 60;
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const minX = Math.min(...xs) - pad, maxX = Math.max(...xs) + pad;
+  const minY = Math.min(...ys) - pad, maxY = Math.max(...ys) + pad;
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const size = Math.max(maxX - minX, maxY - minY);
+  return { x: cx - size / 2, y: cy - size / 2, w: size, h: size };
+}
+function overviewBox() {
+  const ext = R1 + MOD_R + 60;
+  return { x: -ext, y: -ext, w: ext * 2, h: ext * 2 };
+}
+function allOpenBox() {
+  const pts = [[0, 0]];
+  DATA.forEach(m => {
+    pts.push([m.x, m.y]);
+    if (openModules.has(m.id)) m.children.forEach(c => pts.push([c.x, c.y]));
+  });
+  return boxOf(pts);
+}
+
+let currentBox = overviewBox();
+function fitView(box, animate) {
+  if (!animate) { svg.setAttribute("viewBox", `${box.x} ${box.y} ${box.w} ${box.h}`); currentBox = box; return; }
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { fitView(box, false); return; }
+  const from = { ...currentBox }, to = box, dur = 420, t0 = performance.now();
+  const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  (function step(now) {
+    const t = Math.min(1, (now - t0) / dur), e = ease(t);
+    svg.setAttribute("viewBox",
+      `${from.x + (to.x - from.x) * e} ${from.y + (to.y - from.y) * e} ${from.w + (to.w - from.w) * e} ${from.h + (to.h - from.h) * e}`);
+    if (t < 1) requestAnimationFrame(step); else currentBox = to;
+  })(performance.now());
+}
+fitView(overviewBox(), false);
+
+/* ---------- controls ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
+}
+
+document.getElementById("homeBtn").addEventListener("click", () => {
+  collapseAll();
+  document.getElementById("search").value = "";
+  clearDim();
+  fitView(overviewBox(), true);
+  showPanel("ROOT", CFG.rootTitle, CFG.rootDesc);
+});
+document.getElementById("resetPosBtn").addEventListener("click", resetPositions);
+
+function clearDim() { document.querySelectorAll(".bubble").forEach(b => b.classList.remove("dim")); }
+
+document.getElementById("search").addEventListener("input", e => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) { clearDim(); return; }
+  let mm = null, mc = null;
+  DATA.forEach(m => {
+    if (!mm && (m.title + " " + (m.sub || "") + " " + m.desc).toLowerCase().includes(q)) mm = m;
+    const c = m.children.find(c => (c.title + " " + c.desc).toLowerCase().includes(q));
+    if (c && !mc) { mc = c; mm = m; }
+  });
+  if (!mm) return;
+  if (!openModules.has(mm.id)) openModuleFn(mm);
+  fitView(allOpenBox(), true);
+  const rec = openModules.get(mm.id);
+  document.querySelectorAll(".bubble").forEach(b => {
+    const rel = b.classList.contains("root") || b.getAttribute("data-id") === mm.id;
+    b.classList.toggle("dim", !rel && !rec.bubbles.includes(b));
+  });
+  if (mc) {
+    rec.bubbles.forEach((el, i) => el.classList.toggle("dim", mm.children[i] !== mc));
+    showPanel(mm.tag, mc.title, mc.desc);
+  } else {
+    showPanel(mm.tag, mm.title + (mm.sub ? " · " + mm.sub : ""), mm.desc);
+  }
+});
+</script>
+</body>
+</html>
