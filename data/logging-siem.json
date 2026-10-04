@@ -354,6 +354,39 @@
           "desc": "Filtering your own activity is a calibration exercise: known ground truth shows what the log records, what it misses, and how a real user looks. That baseline is what makes an anomaly in someone else's traffic recognizable during an investigation."
         }
       ]
+    },
+    {
+      "id": "ip-investigation",
+      "tag": "P5",
+      "title": "Investigating an IP",
+      "sub": "In practice",
+      "desc": "What an unknown IP looks like from inside Splunk, and the traps that make a first guess wrong. The method: search broadly, read which role the IP plays in each event, form a hypothesis, then try to disprove it before writing it down.",
+      "children": [
+        {
+          "title": "host vs src vs dest",
+          "desc": "host is the machine that sent the log, often written as a hostname. src started the connection; dest received it. Searching only host=<ip> misses every log where the IP is the other end of a connection."
+        },
+        {
+          "title": "Search the IP as a term",
+          "desc": "index=* TERM(<ip>) | stats count by index, sourcetype, host finds the IP in any field. Then index=* dest=<ip> | stats count by dest_port shows which services it offers, and src=<ip> what it talks to."
+        },
+        {
+          "title": "Read the raw event",
+          "desc": "stats and tstats return tables, not events — run a plain search to get the Events tab. Expand an event with the arrow, click a value to add it to the search, and use Show Source to see neighbouring lines."
+        },
+        {
+          "title": "Visibility limits",
+          "desc": "Splunk sees only what is collected — network traffic is often logged only where it crosses a firewall. Traffic inside one segment may never appear, so a low count can mean low visibility rather than low activity."
+        },
+        {
+          "title": "Not in inventory ≠ suspicious",
+          "desc": "Server inventories usually exclude workstations, which take DHCP addresses and are tracked in EDR or AD instead. A client talking LDAP to a domain controller on 389 is normal background traffic, not a sign of a directory server."
+        },
+        {
+          "title": "Names and hypotheses",
+          "desc": "Abbreviations in hostnames mislead — DC can mean domain controller or data center. Treat a name as a clue, confirm with DNS (SRV records, reverse lookup), and record when a hypothesis changed and why."
+        }
+      ]
     }
   ],
   "url": "https://claude.ai/artifact/6jgWFMyt81S91iWX1xfAjc"
