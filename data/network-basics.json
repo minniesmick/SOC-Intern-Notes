@@ -1,0 +1,296 @@
+{
+  "id": "network-basics",
+  "slug": "network",
+  "emoji": "🌐",
+  "accent": "#ec6fa8",
+  "accentDim": "#4a1f33",
+  "title": "IP, DNS & Ports Concept Map",
+  "subtitle": "From an unknown IP address to knowing what it is and why it exists. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. FQDN, nslookup, filtered…",
+  "rootLabel": "IP · DNS · Ports",
+  "rootTitle": "IP, DNS, Ports & Services",
+  "rootDesc": "An analyst constantly meets bare IP addresses in alerts and logs. This map follows the questions you ask about one: what kind of address it is, what name it has, whether it is alive, which ports answer and why, and finally what kind of asset sits behind it.",
+  "modules": [
+    {
+      "id": "ip",
+      "tag": "N1",
+      "title": "IP Address",
+      "sub": "Layer 3 identity",
+      "desc": "The logical address a device uses on a network. It says where a device is, not what it is — the same machine can change IP, and one IP can front many machines.",
+      "children": [
+        {
+          "title": "IPv4 vs IPv6",
+          "desc": "IPv4 is 32 bits written as four octets (10.20.30.40). IPv6 is 128 bits written in hex groups (2001:db8::1). Most internal corporate networks are still mainly IPv4."
+        },
+        {
+          "title": "Private ranges",
+          "desc": "RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16. Not routed on the internet, so a private IP in a log always means an internal asset."
+        },
+        {
+          "title": "Public addresses",
+          "desc": "Globally routable and registered to an owner. WHOIS and ASN lookups tell you which organization or cloud provider holds the block."
+        },
+        {
+          "title": "Static vs DHCP",
+          "desc": "Servers usually keep a fixed IP; workstations lease one from DHCP and it can change. That is why an IP alone is weak evidence for which user did something — check the time and the DHCP lease."
+        },
+        {
+          "title": "NAT",
+          "desc": "Many internal addresses leave the network through one public IP. Seen from outside, the whole company can look like a single address."
+        },
+        {
+          "title": "Special addresses",
+          "desc": "127.0.0.1 is loopback (the machine itself). 169.254.x.x (APIPA) means DHCP failed. 0.0.0.0 in a listener means all interfaces."
+        }
+      ]
+    },
+    {
+      "id": "subnet",
+      "tag": "N2",
+      "title": "Subnet",
+      "sub": "CIDR & masks",
+      "desc": "A block of consecutive addresses that sit on one network segment. Subnetting is how networks are divided by purpose — users, servers, management, DMZ — so that traffic between them can be controlled.",
+      "children": [
+        {
+          "title": "CIDR notation",
+          "desc": "10.20.30.0/24 means the first 24 bits are the network part. A /24 has 256 addresses, 254 usable; a /16 has 65,536."
+        },
+        {
+          "title": "Subnet mask",
+          "desc": "The same thing written as an address: /24 = 255.255.255.0. ipconfig shows it next to each IP."
+        },
+        {
+          "title": "Network & broadcast",
+          "desc": "The first address names the network and the last is broadcast; neither is given to a host."
+        },
+        {
+          "title": "Default gateway",
+          "desc": "The router address a host sends traffic to when the destination is outside its own subnet."
+        },
+        {
+          "title": "Why it matters to a SOC",
+          "desc": "Subnets usually map to roles. Knowing that a range is the server VLAN or the VPN pool tells you a lot about an IP before you look anything else up."
+        }
+      ]
+    },
+    {
+      "id": "dns",
+      "tag": "N3",
+      "title": "DNS",
+      "sub": "Names ↔ addresses",
+      "desc": "The Domain Name System translates names into IP addresses and back. It is also one of the richest log sources a SOC has, because almost every connection starts with a DNS query.",
+      "children": [
+        {
+          "title": "Resolution flow",
+          "desc": "Client asks its resolver; the resolver walks root → TLD (.com) → the domain's authoritative server, then caches the answer for its TTL."
+        },
+        {
+          "title": "A / AAAA",
+          "desc": "Name to IPv4 and name to IPv6. The most common records."
+        },
+        {
+          "title": "CNAME",
+          "desc": "An alias pointing to another name. Common in front of load balancers and SaaS services."
+        },
+        {
+          "title": "PTR (reverse)",
+          "desc": "IP back to name. Optional and maintained separately, so a missing or stale PTR record is normal and not by itself suspicious."
+        },
+        {
+          "title": "MX / TXT / NS",
+          "desc": "Mail servers, free-text records (SPF, DKIM, domain verification), and which servers are authoritative for the zone."
+        },
+        {
+          "title": "Internal vs public DNS",
+          "desc": "Split-horizon: an internal name may resolve only on the corporate network, or resolve to a different IP inside than outside. Always note which DNS server answered."
+        }
+      ]
+    },
+    {
+      "id": "fqdn",
+      "tag": "N4",
+      "title": "FQDN",
+      "sub": "Full name",
+      "desc": "Fully Qualified Domain Name — the complete, unambiguous name of a host, from the hostname up to the top-level domain.",
+      "children": [
+        {
+          "title": "Anatomy",
+          "desc": "web01.corp.example.com → host web01, domain corp.example.com, TLD com. Strictly, a trailing dot (com.) marks the root."
+        },
+        {
+          "title": "Short name vs FQDN",
+          "desc": "Typing web01 works only because the OS appends DNS suffixes from its search list. The FQDN works from anywhere that can reach that DNS zone."
+        },
+        {
+          "title": "Naming conventions",
+          "desc": "Hostnames often encode site, role, environment, and number. Learning the convention lets you read an asset's purpose straight from its name."
+        },
+        {
+          "title": "In logs",
+          "desc": "Some sources log the short name, some the FQDN, some only the IP. Correlating across them means resolving each to the same identity."
+        }
+      ]
+    },
+    {
+      "id": "ports",
+      "tag": "N5",
+      "title": "Ports & Services",
+      "sub": "Layer 4",
+      "desc": "An IP gets traffic to a machine; a port gets it to a specific service on that machine. A port number is a convention, not a guarantee — any service can listen on any port.",
+      "children": [
+        {
+          "title": "TCP vs UDP",
+          "desc": "TCP sets up a connection with a three-way handshake and confirms delivery. UDP just sends. DNS queries and syslog commonly use UDP; web and RDP use TCP."
+        },
+        {
+          "title": "Remote access",
+          "desc": "22 SSH (Linux, network devices), 3389 RDP (Windows), 5985/5986 WinRM."
+        },
+        {
+          "title": "Web",
+          "desc": "80 HTTP, 443 HTTPS, plus 8080/8443 for alternate or admin interfaces."
+        },
+        {
+          "title": "Windows & directory",
+          "desc": "445 SMB (file shares), 135 RPC, 88 Kerberos, 389/636 LDAP/LDAPS. Seeing 88 and 389 together strongly suggests a domain controller."
+        },
+        {
+          "title": "Infrastructure",
+          "desc": "53 DNS, 25 SMTP, 123 NTP, 161 SNMP, 514 syslog, 1433 MSSQL, 3306 MySQL."
+        },
+        {
+          "title": "Port states",
+          "desc": "Open: something is listening and answered. Closed: the host answered but nothing listens (TCP reset). Filtered: no answer at all, usually a firewall dropping the packet."
+        }
+      ]
+    },
+    {
+      "id": "cmd",
+      "tag": "N6",
+      "title": "CMD / PowerShell Toolkit",
+      "sub": "Hands-on",
+      "desc": "The built-in Windows commands that answer most questions about an IP without installing anything.",
+      "children": [
+        {
+          "title": "nslookup",
+          "desc": "nslookup <name> resolves forward; nslookup <ip> does a reverse (PTR) lookup. nslookup <name> <dns-server> asks a specific server — useful for comparing internal and public answers."
+        },
+        {
+          "title": "Resolve-DnsName",
+          "desc": "PowerShell equivalent with record types: Resolve-DnsName <name> -Type A, or -Type PTR. Output is structured, so it pipes cleanly."
+        },
+        {
+          "title": "ping",
+          "desc": "ping -a <ip> sends ICMP echo and also tries a reverse name lookup. A reply proves the host is up; no reply proves nothing on its own."
+        },
+        {
+          "title": "Test-NetConnection",
+          "desc": "Test-NetConnection <ip> -Port 443 makes a real TCP connection and reports TcpTestSucceeded. The right tool for 'is this port reachable from here'."
+        },
+        {
+          "title": "tracert",
+          "desc": "Lists the routers on the path. Where the hops stop shows roughly where traffic is being dropped."
+        },
+        {
+          "title": "ipconfig & netstat",
+          "desc": "ipconfig /all shows your own IP, mask, gateway, and DNS servers. netstat -ano shows your machine's open connections and the process ID behind each."
+        }
+      ]
+    },
+    {
+      "id": "liveness",
+      "tag": "N7",
+      "title": "Is It Alive?",
+      "sub": "Liveness",
+      "desc": "Deciding whether an address is in use is harder than it looks, because many hosts are deliberately quiet. Use several signals, not one.",
+      "children": [
+        {
+          "title": "ICMP is often blocked",
+          "desc": "Firewalls and Windows hosts frequently drop ping. A silent ping means 'unknown', not 'dead'."
+        },
+        {
+          "title": "Try a TCP port",
+          "desc": "A successful Test-NetConnection on any likely port (443, 445, 22, 3389) proves the host is alive even when ping fails. A refused connection also proves it — something answered."
+        },
+        {
+          "title": "DNS is not liveness",
+          "desc": "A name that resolves only proves a record exists. Decommissioned servers often keep their DNS records for months."
+        },
+        {
+          "title": "Same-subnet check",
+          "desc": "On the local subnet, arp -a after a ping shows whether a MAC address answered, even if ICMP itself was blocked by the host."
+        },
+        {
+          "title": "Scope and permission",
+          "desc": "A few manual checks are normal. Port-scanning ranges with a tool like nmap can trigger alerts and may break policy — do it only when it is explicitly in scope."
+        }
+      ]
+    },
+    {
+      "id": "unreachable",
+      "tag": "N8",
+      "title": "Why a Port Is Unreachable",
+      "sub": "Diagnosis",
+      "desc": "An unreachable port is usually a design decision, not a fault. The goal is to work out at which layer the traffic stops.",
+      "children": [
+        {
+          "title": "Nothing is listening",
+          "desc": "Fast 'connection refused': the host is reachable but the service is stopped or was never installed."
+        },
+        {
+          "title": "Network firewall",
+          "desc": "Timeout with no reply: a firewall between the subnets drops the traffic. Segmentation means a workstation is not supposed to reach a database port directly."
+        },
+        {
+          "title": "Host firewall",
+          "desc": "Windows Firewall or iptables on the target allows the port only from certain sources, such as admin jump hosts."
+        },
+        {
+          "title": "Bound to localhost",
+          "desc": "The service listens on 127.0.0.1 only, so it is reachable from the machine itself but from nowhere else."
+        },
+        {
+          "title": "Wrong vantage point",
+          "desc": "Reachability depends on where you test from. Office network, VPN, and a server zone can each see a different set of open ports on the same IP."
+        },
+        {
+          "title": "Least privilege",
+          "desc": "The underlying reason for most of the above: expose a service only to those who need it. Fewer reachable ports means less attack surface."
+        }
+      ]
+    },
+    {
+      "id": "asset",
+      "tag": "N9",
+      "title": "What Is This Asset?",
+      "sub": "Putting it together",
+      "desc": "The final question: why does this IP exist, where is it used, and which system or service is it tied to. Answer it by combining every clue above with the organization's own records.",
+      "children": [
+        {
+          "title": "Read the name",
+          "desc": "The reverse-DNS name or FQDN and the naming convention often state role, site, and environment outright."
+        },
+        {
+          "title": "Read the ports",
+          "desc": "The set of open ports is a fingerprint: 3389 + 445 suggests a Windows server, 22 alone a Linux host or network device, 443 alone a web front end, load balancer VIP, or appliance."
+        },
+        {
+          "title": "Ask the inventory",
+          "desc": "The asset inventory or CMDB records owner, purpose, and criticality. It is the authoritative answer; everything else is inference."
+        },
+        {
+          "title": "Ask the SIEM and EDR",
+          "desc": "Search the IP in logs: which hosts talk to it, on which ports, how often. EDR shows whether an agent runs there and which hostname it reports."
+        },
+        {
+          "title": "Public IP lookups",
+          "desc": "For external addresses: WHOIS, ASN, and reputation services show the owner (a cloud provider, a CDN, a SaaS vendor) and any known bad history."
+        },
+        {
+          "title": "Common asset types",
+          "desc": "Workstation, server, network device, load balancer VIP, DNS or domain controller, external SaaS. A VIP is a shared address in front of several servers, so the name, ports, and owner you find describe the service, not one machine."
+        }
+      ]
+    }
+  ]
+}

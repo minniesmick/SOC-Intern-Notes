@@ -6,7 +6,7 @@
   "accentDim": "#164a2c",
   "title": "Logging & SIEM Concept Map",
   "subtitle": "From a single log line to a confirmed incident. Tap a bubble.",
-  "searchPlaceholder": "Search: e.g. CEF, sourcetype, triage…",
+  "searchPlaceholder": "Search: e.g. CEF, sourcetype, risk score…",
   "rootLabel": "Logging & SIEM",
   "rootTitle": "Logging & SIEM",
   "rootDesc": "Everything a SOC knows, it knows from logs. This map follows the chain: an application writes a log, a format carries it, a SIEM collects and correlates it, a rule turns it into an alert, and an analyst decides whether it is an incident. Splunk appears here as the specific tool, but the concepts transfer to any SIEM.",
@@ -319,6 +319,39 @@
         {
           "title": "Open-source options",
           "desc": "Wazuh and Graylog — the practical route to building a home lab and feeding it Sysmon data."
+        }
+      ]
+    },
+    {
+      "id": "spl-handson",
+      "tag": "P4",
+      "title": "Hands-on SPL",
+      "sub": "First queries",
+      "desc": "The practical half of the exercise: find out what data you can see, learn what produces it, then filter it. Field names below are typical of web proxy logs; the exact names depend on the vendor and the sourcetype, so check the field sidebar first.",
+      "children": [
+        {
+          "title": "Which indexes can I see?",
+          "desc": "| eventcount summarize=false index=* lists every index your role can search. | tstats count where index=* by index gives the same with event volume, and is fast because it reads only metadata."
+        },
+        {
+          "title": "What is inside them?",
+          "desc": "| tstats count where index=<name> by sourcetype, host shows which systems and log types feed an index. Each sourcetype is a clue to look up: a proxy, a firewall, a mail gateway, an identity provider."
+        },
+        {
+          "title": "Filter by category",
+          "desc": "index=<proxy> category=\"Gambling\" | stats count by user, url. Field-value pairs before the first pipe filter at search time; stats then turns raw events into a table."
+        },
+        {
+          "title": "Category + risk score",
+          "desc": "index=<proxy> category=\"Uncategorized\" risk_score>=70 | table _time user src_ip url action. Combining two conditions is what turns a noisy list into a short one worth reading — uncategorized and high-risk together is far rarer than either alone."
+        },
+        {
+          "title": "My own traffic",
+          "desc": "index=<proxy> user=\"<your username>\" earliest=-24h | stats count by domain | sort -count. You know what you actually browsed, so you can check whether the logs tell the truth."
+        },
+        {
+          "title": "Why do this",
+          "desc": "Filtering your own activity is a calibration exercise: known ground truth shows what the log records, what it misses, and how a real user looks. That baseline is what makes an anomaly in someone else's traffic recognizable during an investigation."
         }
       ]
     }

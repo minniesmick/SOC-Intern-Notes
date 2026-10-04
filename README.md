@@ -35,7 +35,8 @@ SOC Intern Notes/
     ├── webapp-vulns.json
     ├── containers-k8s.json
     ├── cloud-fundamentals.json
-    └── logging-siem.json
+    ├── logging-siem.json
+    └── network-basics.json
 ```
 
 The single source of truth for content is `data/*.json`. Never edit the
