@@ -6,7 +6,7 @@
   "accentDim": "#4a1f33",
   "title": "IP, DNS & Ports Concept Map",
   "subtitle": "From an unknown IP address to knowing what it is and why it exists. Tap a bubble.",
-  "searchPlaceholder": "Search: e.g. FQDN, nslookup, filtered…",
+  "searchPlaceholder": "Search: e.g. FQDN, nslookup, VIP…",
   "rootLabel": "IP · DNS · Ports",
   "rootTitle": "IP, DNS, Ports & Services",
   "rootDesc": "An analyst constantly meets bare IP addresses in alerts and logs. This map follows the questions you ask about one: what kind of address it is, what name it has, whether it is alive, which ports answer and why, and finally what kind of asset sits behind it.",
@@ -289,6 +289,39 @@
         {
           "title": "Common asset types",
           "desc": "Workstation, server, network device, load balancer VIP, DNS or domain controller, external SaaS. A VIP is a shared address in front of several servers, so the name, ports, and owner you find describe the service, not one machine."
+        }
+      ]
+    },
+    {
+      "id": "lb-vip",
+      "tag": "N10",
+      "title": "Load Balancers & VIPs",
+      "sub": "Service addresses",
+      "desc": "A load balancer receives client traffic on one address and spreads it across several backend servers. That address — the VIP — belongs to a service, not to a machine, which is why it behaves differently from every other IP you investigate.",
+      "children": [
+        {
+          "title": "What a VIP is",
+          "desc": "A virtual IP configured on the load balancer. Clients connect to it; the load balancer picks a healthy backend and forwards the request. If one backend fails, the VIP keeps answering."
+        },
+        {
+          "title": "VIP subnet",
+          "desc": "Load balancers usually take their VIPs from a dedicated range. Knowing that range means any address in it can be read straight away as a service address rather than a host."
+        },
+        {
+          "title": "Fingerprint",
+          "desc": "Only the service ports answer — typically 443 or 389 — with no management ports like 3389, 445, or 22. It never appears as host in the SIEM, because there is no operating system behind it sending its own logs."
+        },
+        {
+          "title": "Source NAT",
+          "desc": "Many load balancers replace the client's address with their own when forwarding. Backend servers then see every request coming from the load balancer, so finding the real client means looking at the load balancer's logs."
+        },
+        {
+          "title": "Health checks",
+          "desc": "The load balancer probes each backend on a schedule to decide whether it can receive traffic. These probes show up as steady, regular connections from the load balancer to the backends."
+        },
+        {
+          "title": "Identifying the service",
+          "desc": "The right question is not which machine this is but which application it serves and what sits behind it. The DNS name usually answers the first; the load balancer configuration or the team that runs it answers the second."
         }
       ]
     }
