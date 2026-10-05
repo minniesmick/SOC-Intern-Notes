@@ -6,7 +6,7 @@
   "accentDim": "#4a1f33",
   "title": "IP, DNS & Ports Concept Map",
   "subtitle": "From an unknown IP address to knowing what it is and why it exists. Tap a bubble.",
-  "searchPlaceholder": "Search: e.g. FQDN, nslookup, VIP…",
+  "searchPlaceholder": "Search: e.g. FQDN, nslookup, VIP, ICAP…",
   "rootLabel": "IP · DNS · Ports",
   "rootTitle": "IP, DNS, Ports & Services",
   "rootDesc": "An analyst constantly meets bare IP addresses in alerts and logs. This map follows the questions you ask about one: what kind of address it is, what name it has, whether it is alive, which ports answer and why, and finally what kind of asset sits behind it.",
@@ -322,6 +322,39 @@
         {
           "title": "Identifying the service",
           "desc": "The right question is not which machine this is but which application it serves and what sits behind it. The DNS name usually answers the first; the load balancer configuration or the team that runs it answers the second."
+        }
+      ]
+    },
+    {
+      "id": "icap",
+      "tag": "N11",
+      "title": "ICAP",
+      "sub": "Content scanning",
+      "desc": "Internet Content Adaptation Protocol (RFC 3507). Lets a proxy hand content to a separate server for inspection instead of scanning it itself, then act on the verdict. A server labelled ICAP is almost always an antivirus, sandbox, or DLP engine sitting behind a proxy or mail gateway.",
+      "children": [
+        {
+          "title": "The flow",
+          "desc": "A user downloads a file or submits a form. The proxy sends the content to the ICAP server, which scans it and answers: allow, block, or a modified version. The proxy then delivers or blocks it."
+        },
+        {
+          "title": "REQMOD",
+          "desc": "Request modification — the outgoing request is inspected before it leaves. Typically used for DLP: is sensitive data being uploaded?"
+        },
+        {
+          "title": "RESPMOD",
+          "desc": "Response modification — the incoming response is inspected before the user gets it. Typically used for antivirus and sandboxing: is the downloaded file malicious?"
+        },
+        {
+          "title": "Ports",
+          "desc": "1344 for ICAP, 11344 for ICAPS over TLS. An open 1344 on a server marks it as a content-scanning layer."
+        },
+        {
+          "title": "Who may reach it",
+          "desc": "Only the systems that send content — proxies, mail gateways, file-upload applications. Seen from a workstation, 1344 is usually filtered, and that is the intended design rather than a fault."
+        },
+        {
+          "title": "In the SIEM",
+          "desc": "dest_port=1344 with stats count by src reveals which systems send content for scanning — often the proxy itself. ICAP server logs usually carry user, URL, and the scan verdict."
         }
       ]
     }
