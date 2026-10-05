@@ -33,6 +33,10 @@
         {
           "title": "Blind to",
           "desc": "What happens after something is allowed to run: legitimate tools used maliciously, stolen credentials, slow hands-on attacks."
+        },
+        {
+          "title": "In Falcon",
+          "desc": "Falcon Prevent is the EPP layer: ML file analysis, behavioral blocking, and quarantine on the host."
         }
       ]
     },
@@ -58,6 +62,10 @@
         {
           "title": "Blind to",
           "desc": "Devices without an agent (printers, IoT, unmanaged laptops), network-only activity, and identity or cloud events outside the host."
+        },
+        {
+          "title": "In Falcon",
+          "desc": "Falcon Insight is the EDR layer: Detections, Process Tree, Host Timeline, and response actions such as network containment."
         }
       ]
     },

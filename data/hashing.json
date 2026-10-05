@@ -94,11 +94,15 @@
         },
         {
           "title": "Encoding is not either",
-          "desc": "Base64 and URL encoding are reversible by anyone with no key. Seeing Base64 in a log means nothing is hidden, only reformatted — a common trick in malicious PowerShell."
+          "desc": "Base64 and URL encoding are reversible by anyone with no key. Seeing Base64 in a log means nothing is hidden, only reformatted — a common trick in malicious PowerShell (-EncodedCommand / -enc). Decode it in CyberChef: From Base64, then Decode text (UTF-16LE), because PowerShell encodes its commands as UTF-16LE. The Magic operation can guess the layers. Use a locally saved copy of CyberChef for anything sensitive."
         },
         {
           "title": "Used together",
           "desc": "Digital signatures hash the document, then encrypt the hash with a private key. TLS uses both: encryption for secrecy, HMAC for integrity."
+        },
+        {
+          "title": "Why not encrypt?",
+          "desc": "A login only needs to check a password, never to read it back. Encrypted passwords need a key stored somewhere, and if that key is stolen every password opens at once. A salted slow hash has no key to steal."
         }
       ]
     },
@@ -124,6 +128,14 @@
         {
           "title": "Speed is the enemy",
           "desc": "A modern GPU computes billions of MD5 or SHA-256 hashes per second. Password functions like Argon2 are slow on purpose to cut that to thousands."
+        },
+        {
+          "title": "Online vs offline",
+          "desc": "Online: the attacker guesses against the live login. It shows in logs (many failed logons, lockouts) and rate limits slow it. Offline: the attacker already holds the hashes and guesses on their own hardware — no lockout, no logs, nothing for the SOC to see. So the SOC cannot catch the cracking, only the theft: credential dumping, LSASS access, an NTDS.dit copy, a database export."
+        },
+        {
+          "title": "NTLM: fast and unsalted",
+          "desc": "The Windows NT hash is a single unsalted MD4 of the password. The same password gives the same hash on every machine, a GPU tests billions per second, and the hash alone is enough for pass-the-hash. That is why hash dumping is a critical alert: it is the moment the attacker gets material they can use or crack offline."
         }
       ]
     },
@@ -186,6 +198,10 @@
         {
           "title": "Retire weak algorithms",
           "desc": "No MD5 or SHA-1 for signatures, certificates, or passwords. Disable NTLM where Kerberos can replace it to shrink pass-the-hash exposure."
+        },
+        {
+          "title": "Protect LSASS",
+          "desc": "Credential dumping reads LSASS memory, so harden it. Credential Guard isolates secrets in a virtualized container, out of reach of normal processes. LSA Protection (RunAsPPL) lets only signed code open LSASS. Limit local admin rights and make local admin passwords unique per machine (LAPS), because reading LSASS needs high privilege and shared passwords make stolen hashes work everywhere."
         }
       ]
     },
@@ -219,6 +235,10 @@
         {
           "title": "Integrity checks",
           "desc": "Comparing a download against the vendor's published hash, or a system file against a known-good baseline, shows whether it was tampered with."
+        },
+        {
+          "title": "Verify an MD5 hit",
+          "desc": "Some reports only list MD5. Treat an MD5 match as a lead, not proof, since MD5 collisions can be crafted. Hash the same file with SHA-256 and check that value too: Get-FileHash <file> -Algorithm MD5, or certutil -hashfile <file> MD5."
         }
       ]
     }
