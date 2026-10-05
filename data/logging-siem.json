@@ -158,6 +158,39 @@
       ]
     },
     {
+      "id": "format-recognize",
+      "tag": "F5",
+      "title": "Recognizing Formats",
+      "sub": "Raw view",
+      "desc": "Splunk has no log format of its own: it stores each event exactly as it arrived, in the _raw field, so every sourcetype can look different. Switch the Events view from List to Raw and match the first characters of a line against the samples below. Addresses use documentation ranges.",
+      "children": [
+        {
+          "title": "Syslog",
+          "desc": "<134>Oct  5 10:12:01 web01 sshd[2211]: Accepted password for alice from 192.0.2.10 port 51514 ssh2 — a priority value in angle brackets (facility × 8 + severity), then timestamp, hostname, program and PID. Everything after the colon is free text."
+        },
+        {
+          "title": "CEF over syslog",
+          "desc": "<134>Oct  5 10:12:01 fw01 CEF:0|ExampleVendor|ExampleFW|1.0|100|Connection blocked|5|src=192.0.2.10 dst=198.51.100.20 dpt=445 act=blocked — the syslog header carries it; from CEF:0 onwards is the content. Syslog is the transport and CEF the format, which is the most common way the two meet."
+        },
+        {
+          "title": "JSON",
+          "desc": "{\"time\":\"2026-10-05T10:12:01Z\",\"user\":\"alice\",\"source\":{\"ip\":\"192.0.2.10\"},\"action\":\"login\",\"result\":\"success\"} — braces and quoted keys, with nesting. Typical of cloud services and modern applications; Splunk extracts the fields automatically, or with | spath."
+        },
+        {
+          "title": "Key=value",
+          "desc": "date=2026-10-05 time=10:12:01 type=traffic srcip=192.0.2.10 dstip=198.51.100.20 dstport=443 action=accept — flat pairs with no CEF header, each vendor choosing its own key names. Common on firewalls; Fortigate writes this way."
+        },
+        {
+          "title": "CSV",
+          "desc": "1,2026/10/05 10:12:01,001122334455,TRAFFIC,end,2561,2026/10/05 10:12:01,192.0.2.10,198.51.100.20,... — comma-separated values in a fixed order with no names. A field only means something by its position, so the vendor's add-on is needed to label it. Palo Alto's classic format."
+        },
+        {
+          "title": "Windows Event Log",
+          "desc": "LogName=Security EventCode=4624 ComputerName=PC01.example.com Message=An account was successfully logged on. — multi-line text, or XML starting with <Event xmlns=...> when collected as XmlWinEventLog. The EventCode is the key field: 4624 logon, 4625 failed logon, 4688 process creation."
+        }
+      ]
+    },
+    {
       "id": "siem",
       "tag": "S1",
       "title": "SIEM",

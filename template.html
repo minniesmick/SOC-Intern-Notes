@@ -311,8 +311,10 @@ function toggleModule(m) {
   showPanel(m.tag, m.title + (m.sub ? " · " + m.sub : ""), m.desc);
 }
 
+// Escape so placeholders like <ip> and raw log samples render as text.
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function showPanel(tag, title, desc) {
-  panel.innerHTML = `<div class="tag">${tag}</div><h3>${title}</h3><p>${desc}</p>`;
+  panel.innerHTML = `<div class="tag">${esc(tag)}</div><h3>${esc(title)}</h3><p>${esc(desc)}</p>`;
 }
 showPanel("ROOT", CFG.rootTitle, CFG.rootDesc);
 
