@@ -1,0 +1,208 @@
+{
+  "id": "mitre-attack",
+  "slug": "mitre",
+  "emoji": "🎯",
+  "accent": "#c58af9",
+  "accentDim": "#3b2652",
+  "title": "MITRE ATT&CK Concept Map",
+  "subtitle": "The shared language for what attackers do, and the objects linked around each technique. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. tactic, mitigation, APT29…",
+  "rootLabel": "MITRE ATT&CK",
+  "rootTitle": "MITRE ATT&CK",
+  "rootDesc": "A free knowledge base, maintained by the non-profit MITRE, of adversary tactics and techniques observed in real attacks. It gives defenders, vendors, and threat reports one vocabulary: instead of 'the attacker ran a script', everyone writes T1059.001. For the attack chain itself, see the Endpoint Security map.",
+  "modules": [
+    {
+      "id": "framework",
+      "tag": "A1",
+      "title": "The Framework",
+      "sub": "What and why",
+      "desc": "ATT&CK stands for Adversarial Tactics, Techniques, and Common Knowledge. It is a matrix: columns are tactics, cells are the techniques used to achieve them.",
+      "children": [
+        {
+          "title": "Built from observation",
+          "desc": "Every technique is documented with real-world examples from incident reports, not theory. That is what makes it credible."
+        },
+        {
+          "title": "Matrices",
+          "desc": "Enterprise (Windows, Linux, macOS, cloud, network, containers), Mobile, and ICS for industrial systems. SOC work is almost all Enterprise."
+        },
+        {
+          "title": "Common language",
+          "desc": "An EDR detection, a threat report, and a SIEM rule can all point to the same technique ID, so they can be correlated."
+        },
+        {
+          "title": "Coverage mapping",
+          "desc": "Mark which techniques your rules detect to see the gaps. ATT&CK Navigator is the free tool for colouring the matrix."
+        },
+        {
+          "title": "Threat-informed defense",
+          "desc": "Look up which techniques the groups targeting your sector use, then check whether you detect those first."
+        },
+        {
+          "title": "Not a checklist",
+          "desc": "Detecting every technique is neither possible nor the goal; some are normal admin behavior. Prioritize by threat and impact."
+        }
+      ]
+    },
+    {
+      "id": "tactic-technique",
+      "tag": "A2",
+      "title": "Tactic vs Technique",
+      "sub": "Why vs how",
+      "desc": "The tactic is the attacker's goal at that step — the why. The technique is the method used to reach it — the how. One technique can serve several tactics.",
+      "children": [
+        {
+          "title": "Tactic",
+          "desc": "A column such as Persistence (TA0003): 'I want to survive a reboot.' Enterprise has 14 tactics."
+        },
+        {
+          "title": "Technique",
+          "desc": "A cell such as Scheduled Task/Job (T1053): one way to achieve persistence."
+        },
+        {
+          "title": "Sub-technique",
+          "desc": "A more specific variant, written with a dot: T1053.005 Scheduled Task on Windows; T1059.001 PowerShell under Command and Scripting Interpreter."
+        },
+        {
+          "title": "Procedure",
+          "desc": "The exact implementation a specific group or tool used — the concrete command line. Shown as examples on each technique page."
+        },
+        {
+          "title": "One technique, many tactics",
+          "desc": "Valid Accounts (T1078) appears under Initial Access, Persistence, Privilege Escalation, and Defense Evasion, because stolen credentials serve all four goals."
+        },
+        {
+          "title": "ID prefixes",
+          "desc": "TA tactic, T technique, M mitigation, G group, S software, DS data source, C campaign."
+        }
+      ]
+    },
+    {
+      "id": "tactics-a",
+      "tag": "A3",
+      "title": "Tactics 1–7",
+      "sub": "Getting in and settling",
+      "desc": "The first half of the Enterprise matrix, in the order an intrusion usually unfolds. Real attacks skip and repeat steps.",
+      "children": [
+        { "title": "Reconnaissance", "desc": "TA0043 — gather information on the target: employees, exposed services, technologies." },
+        { "title": "Resource Development", "desc": "TA0042 — buy domains, rent servers, build or acquire malware, steal accounts." },
+        { "title": "Initial Access", "desc": "TA0001 — first foothold: phishing, exploiting a public-facing app, valid credentials." },
+        { "title": "Execution", "desc": "TA0002 — run attacker code: PowerShell, scripts, a user opening a file." },
+        { "title": "Persistence", "desc": "TA0003 — survive reboots and password changes: scheduled tasks, Run keys, new services or accounts." },
+        { "title": "Privilege Escalation", "desc": "TA0004 — gain higher rights: local exploits, misconfigurations, UAC bypass." },
+        { "title": "Defense Evasion", "desc": "TA0005 — avoid detection: disable security tools, inject into trusted processes, clear logs." }
+      ]
+    },
+    {
+      "id": "tactics-b",
+      "tag": "A4",
+      "title": "Tactics 8–14",
+      "sub": "Spreading and acting",
+      "desc": "The second half: expanding through the network and achieving the goal.",
+      "children": [
+        { "title": "Credential Access", "desc": "TA0006 — steal passwords and hashes: LSASS dumping, keylogging, brute force." },
+        { "title": "Discovery", "desc": "TA0007 — learn the environment: list users, domain admins, shares, other hosts." },
+        { "title": "Lateral Movement", "desc": "TA0008 — move to other systems: RDP, SMB with stolen hashes, remote services." },
+        { "title": "Collection", "desc": "TA0009 — gather the data of interest: files, email, screenshots, clipboard." },
+        { "title": "Command and Control", "desc": "TA0011 — talk to attacker infrastructure: HTTPS beacons, DNS tunneling." },
+        { "title": "Exfiltration", "desc": "TA0010 — get data out: over the C2 channel, to cloud storage." },
+        { "title": "Impact", "desc": "TA0040 — the final damage: encryption for ransom, data destruction, service disruption." }
+      ]
+    },
+    {
+      "id": "objects",
+      "tag": "A5",
+      "title": "Linked Objects",
+      "sub": "Around each technique",
+      "desc": "Each technique page connects to other object types. Following those links answers the defender's questions about a technique.",
+      "children": [
+        {
+          "title": "Detection",
+          "desc": "How to notice the technique in telemetry — what to watch and which behavior is suspicious. Newer ATT&CK versions organize this as detection strategies and analytics."
+        },
+        {
+          "title": "Mitigation",
+          "desc": "Controls that prevent the technique or reduce its effect, with M IDs: M1032 Multi-factor Authentication, M1026 Privileged Account Management, M1038 Execution Prevention."
+        },
+        {
+          "title": "Data Sources",
+          "desc": "Which logs you need to see the technique at all, split into data components: Process (process creation), Command (command execution), Network Traffic (flow). No data source, no detection."
+        },
+        {
+          "title": "Software / Malware",
+          "desc": "Named tools and malware with S IDs. 'Malware' is attacker-built (Emotet); 'tool' is legitimate software abused (Mimikatz S0002, PsExec, Cobalt Strike S0154)."
+        },
+        {
+          "title": "Groups",
+          "desc": "Tracked threat actors with G IDs, each listing the techniques and software they are known to use."
+        },
+        {
+          "title": "Campaigns",
+          "desc": "A set of intrusions over a period with shared goals, given C IDs — for example the SolarWinds compromise."
+        }
+      ]
+    },
+    {
+      "id": "apt",
+      "tag": "A6",
+      "title": "APT",
+      "sub": "Advanced persistent threat",
+      "desc": "A well-resourced, usually state-linked group that targets specific organizations and stays inside for a long time. The word describes the attacker, not the malware.",
+      "children": [
+        {
+          "title": "Advanced",
+          "desc": "Custom tooling and zero-days when needed — though many APTs happily use phishing and public tools when those work."
+        },
+        {
+          "title": "Persistent",
+          "desc": "A long-term objective rather than a quick payout; dwell time can be months, and they return after being evicted."
+        },
+        {
+          "title": "Motivation",
+          "desc": "Espionage, sabotage, or for some states, revenue. Financially driven crime groups are often tracked the same way (FIN groups)."
+        },
+        {
+          "title": "Names differ by vendor",
+          "desc": "The same group has many names: APT29 is Cozy Bear (CrowdStrike) and Midnight Blizzard (Microsoft). ATT&CK lists the aliases on each group page."
+        },
+        {
+          "title": "Why a SOC cares",
+          "desc": "Knowing which groups target your sector and region tells you which techniques to prioritize and which IOCs to hunt for."
+        }
+      ]
+    },
+    {
+      "id": "apt-examples",
+      "tag": "A7",
+      "title": "APT Examples",
+      "sub": "Groups and attacks",
+      "desc": "Well-documented groups and a known operation of each. Attribution comes from governments and vendors; it is rarely certain.",
+      "children": [
+        {
+          "title": "APT28 · G0007",
+          "desc": "Fancy Bear, attributed to Russia's GRU. Breach of the US Democratic National Committee (2016), German Bundestag (2015)."
+        },
+        {
+          "title": "APT29 · G0016",
+          "desc": "Cozy Bear / Midnight Blizzard, attributed to Russia's SVR. The SolarWinds supply-chain compromise (2020), in which a poisoned software update reached around 18,000 customers."
+        },
+        {
+          "title": "Lazarus Group · G0032",
+          "desc": "Attributed to North Korea, financially motivated. Sony Pictures (2014), the $81M Bangladesh Bank SWIFT theft (2016), WannaCry (2017), and the roughly $1.5B Bybit crypto theft (2025)."
+        },
+        {
+          "title": "Sandworm · G0034",
+          "desc": "Attributed to Russia's GRU. Ukrainian power grid outages (2015, 2016) and NotPetya (2017), destructive malware disguised as ransomware."
+        },
+        {
+          "title": "APT41 · G0096",
+          "desc": "Attributed to China. Unusual mix of state espionage and personal financial crime, including supply-chain attacks and video game industry intrusions."
+        },
+        {
+          "title": "Carbanak · G0008",
+          "desc": "Financially motivated group that compromised banks' internal networks and moved money via ATMs and transfers from around 2013. Relevant to any banking SOC."
+        }
+      ]
+    }
+  ]
+}

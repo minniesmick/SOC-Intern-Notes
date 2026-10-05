@@ -1,0 +1,226 @@
+{
+  "id": "hashing",
+  "slug": "hash",
+  "emoji": "#️⃣",
+  "accent": "#d4d84a",
+  "accentDim": "#3f4117",
+  "title": "Hashing Concept Map",
+  "subtitle": "One-way fingerprints: what they prove, where they break, and how a SOC uses them. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. salt, collision, SHA-256…",
+  "rootLabel": "Hash",
+  "rootTitle": "Hashing",
+  "rootDesc": "A hash function turns input of any size into a fixed-size value. The same input always gives the same hash, and there is no way back from the hash to the input. That makes hashes ideal for checking integrity, storing passwords, and identifying files — and useless for hiding data you need to read again.",
+  "modules": [
+    {
+      "id": "what",
+      "tag": "H1",
+      "title": "What Is a Hash?",
+      "sub": "Properties",
+      "desc": "A fingerprint of data. Four properties make a hash function cryptographically useful; lose any one and its security use ends.",
+      "children": [
+        {
+          "title": "Deterministic",
+          "desc": "The same input always produces the same output, on any machine. That is what lets two parties compare files without sending them."
+        },
+        {
+          "title": "Fixed length",
+          "desc": "A 1 KB text file and a 4 GB ISO both give a 64-character SHA-256 value."
+        },
+        {
+          "title": "One-way",
+          "desc": "Computing the hash is fast; recovering the input from the hash is infeasible (preimage resistance)."
+        },
+        {
+          "title": "Avalanche effect",
+          "desc": "Change one bit of input and roughly half the output bits flip. Two similar files have completely unrelated hashes."
+        },
+        {
+          "title": "Collision resistance",
+          "desc": "It should be infeasible to find two different inputs with the same hash. This is the property that weakens first as an algorithm ages."
+        }
+      ]
+    },
+    {
+      "id": "algos",
+      "tag": "H2",
+      "title": "Algorithms",
+      "sub": "MD5 · SHA",
+      "desc": "The names you will see in tools and threat reports. Output length and whether collisions have been found are what matter.",
+      "children": [
+        {
+          "title": "MD5",
+          "desc": "128-bit, 32 hex characters. Collisions have been practical since 2004 and were used in real attacks (Flame malware, 2012). Still common as a quick file identifier, never acceptable for security."
+        },
+        {
+          "title": "SHA-1",
+          "desc": "160-bit, 40 hex characters. A practical collision was published in 2017 (SHAttered). Deprecated for signatures and certificates."
+        },
+        {
+          "title": "SHA-256",
+          "desc": "Part of the SHA-2 family, 256-bit, 64 hex characters. The current default for file identification, certificates, and integrity checks, and what EDR consoles show first."
+        },
+        {
+          "title": "SHA-3",
+          "desc": "A different internal design (Keccak), standardized as a backup in case SHA-2 is ever broken."
+        },
+        {
+          "title": "bcrypt · scrypt · Argon2",
+          "desc": "Password hashing functions. Deliberately slow and tunable, so that guessing billions of passwords per second becomes impossible."
+        }
+      ]
+    },
+    {
+      "id": "vs-encryption",
+      "tag": "H3",
+      "title": "Hash vs Encryption",
+      "sub": "The key question",
+      "desc": "Encryption is two-way: with the key you get the data back. Hashing is one-way: there is no key and no way back. Encoding is neither — it only changes representation.",
+      "children": [
+        {
+          "title": "Direction",
+          "desc": "Encryption: plaintext → ciphertext → plaintext. Hash: input → digest, and stop."
+        },
+        {
+          "title": "Key",
+          "desc": "Encryption needs a key, symmetric (AES) or asymmetric (RSA). A plain hash uses no key at all."
+        },
+        {
+          "title": "Output size",
+          "desc": "Ciphertext grows with the input. A hash is always the same length."
+        },
+        {
+          "title": "Purpose",
+          "desc": "Encryption protects confidentiality. Hashing proves integrity and identity — has this changed, is this the same file, is this the right password."
+        },
+        {
+          "title": "Encoding is not either",
+          "desc": "Base64 and URL encoding are reversible by anyone with no key. Seeing Base64 in a log means nothing is hidden, only reformatted — a common trick in malicious PowerShell."
+        },
+        {
+          "title": "Used together",
+          "desc": "Digital signatures hash the document, then encrypt the hash with a private key. TLS uses both: encryption for secrecy, HMAC for integrity."
+        }
+      ]
+    },
+    {
+      "id": "breakable",
+      "tag": "H4",
+      "title": "Can a Hash Be Broken?",
+      "sub": "Reversal vs guessing",
+      "desc": "A hash cannot be reversed mathematically. What gets 'cracked' is the input: an attacker guesses inputs, hashes them, and compares. Weak inputs and fast algorithms are the real weaknesses.",
+      "children": [
+        {
+          "title": "Preimage",
+          "desc": "Finding any input for a given hash. Not practical even for MD5 — which is why cracking means guessing, not reversing."
+        },
+        {
+          "title": "Collision",
+          "desc": "Two inputs with the same hash. Broken for MD5 and SHA-1, which lets an attacker make a harmless and a malicious file that look identical to a signature check."
+        },
+        {
+          "title": "Password cracking",
+          "desc": "A short or common password falls in seconds whatever the algorithm, because the attacker simply tries likely candidates. A strong, long password stays safe even behind MD5 — but MD5 makes every guess cheap."
+        },
+        {
+          "title": "Speed is the enemy",
+          "desc": "A modern GPU computes billions of MD5 or SHA-256 hashes per second. Password functions like Argon2 are slow on purpose to cut that to thousands."
+        }
+      ]
+    },
+    {
+      "id": "attacks",
+      "tag": "H5",
+      "title": "Hash Attacks",
+      "sub": "Techniques",
+      "desc": "The attacks you will read about in incident reports. Most target password hashes; one skips cracking altogether.",
+      "children": [
+        {
+          "title": "Brute force",
+          "desc": "Try every possible combination. Guaranteed eventually, practical only for short inputs."
+        },
+        {
+          "title": "Dictionary",
+          "desc": "Try lists of real leaked passwords plus rule-based mutations (Password1!, Summer2026). Tools: Hashcat, John the Ripper."
+        },
+        {
+          "title": "Rainbow tables",
+          "desc": "Precomputed hash → password tables that trade disk space for speed. Defeated completely by salting."
+        },
+        {
+          "title": "Collision attack",
+          "desc": "Craft two files with the same weak hash — for example to pass a forged certificate or a malicious file through an MD5 check."
+        },
+        {
+          "title": "Pass-the-Hash",
+          "desc": "Windows NTLM accepts the hash itself as proof of identity, so a stolen hash can be used to log in without ever cracking it. MITRE T1550.002."
+        },
+        {
+          "title": "Credential dumping",
+          "desc": "Where the hashes come from: LSASS memory, the SAM database, or NTDS.dit on a domain controller. MITRE T1003."
+        }
+      ]
+    },
+    {
+      "id": "defenses",
+      "tag": "H6",
+      "title": "Defenses",
+      "sub": "Storing secrets right",
+      "desc": "How systems should store and verify secrets so that a stolen database does not become a list of passwords.",
+      "children": [
+        {
+          "title": "Salt",
+          "desc": "A random value stored with each password and hashed together with it. Identical passwords then produce different hashes, and rainbow tables stop working."
+        },
+        {
+          "title": "Pepper",
+          "desc": "A secret added to every password but stored outside the database, such as in an HSM. A database leak alone is then not enough to start cracking."
+        },
+        {
+          "title": "Slow functions",
+          "desc": "Argon2id, scrypt, or bcrypt with a cost factor raised over time as hardware gets faster."
+        },
+        {
+          "title": "HMAC",
+          "desc": "A hash computed with a secret key. Proves both integrity and that the sender knew the key; used in API signing and TLS."
+        },
+        {
+          "title": "Retire weak algorithms",
+          "desc": "No MD5 or SHA-1 for signatures, certificates, or passwords. Disable NTLM where Kerberos can replace it to shrink pass-the-hash exposure."
+        }
+      ]
+    },
+    {
+      "id": "soc",
+      "tag": "H7",
+      "title": "Hashes in the SOC",
+      "sub": "Daily use",
+      "desc": "For an analyst a hash is mostly a file's identity card: the fastest way to ask whether this exact file has been seen before, here or anywhere.",
+      "children": [
+        {
+          "title": "File IOC",
+          "desc": "Threat reports publish hashes of malicious files. An EDR or SIEM search for that hash shows instantly whether it ran anywhere in the estate."
+        },
+        {
+          "title": "Reputation lookup",
+          "desc": "Paste a SHA-256 into VirusTotal or the EDR's intel module to see detections and first-seen date. Look up the hash, never upload an internal file — uploads become visible to others."
+        },
+        {
+          "title": "Compute one",
+          "desc": "PowerShell: Get-FileHash <file> (SHA-256 by default). CMD: certutil -hashfile <file> SHA256."
+        },
+        {
+          "title": "The weakness",
+          "desc": "Change one byte and the hash changes. Attackers recompile or pad malware so every victim gets a unique hash — the bottom of the Pyramid of Pain, trivial for them to change."
+        },
+        {
+          "title": "Fuzzy hashing",
+          "desc": "ssdeep and TLSH score how similar two files are, and imphash fingerprints a program's imported functions. They catch variants that an exact hash misses."
+        },
+        {
+          "title": "Integrity checks",
+          "desc": "Comparing a download against the vendor's published hash, or a system file against a known-good baseline, shows whether it was tampered with."
+        }
+      ]
+    }
+  ]
+}

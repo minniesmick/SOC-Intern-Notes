@@ -1,0 +1,148 @@
+{
+  "id": "detection-response",
+  "slug": "xdr",
+  "emoji": "🧩",
+  "accent": "#36c2a8",
+  "accentDim": "#14423a",
+  "title": "EPP · EDR · XDR · NDR Concept Map",
+  "subtitle": "What each technology sees, where it acts, and how they differ. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. telemetry, isolate, beaconing…",
+  "rootLabel": "EPP · EDR · XDR · NDR",
+  "rootTitle": "Detection & Response Technologies",
+  "rootDesc": "Four product categories that are often confused. The way to tell them apart is three questions: what data does it see, at what point can it act, and what is it blind to? EPP and EDR live on the endpoint, NDR on the network, and XDR sits above them, joining their data.",
+  "modules": [
+    {
+      "id": "epp",
+      "tag": "X1",
+      "title": "EPP",
+      "sub": "Endpoint Protection Platform",
+      "desc": "Prevention on each device: stop known and likely-bad files from running. The successor of antivirus.",
+      "children": [
+        {
+          "title": "Sees",
+          "desc": "Files written or executed on the endpoint, their hashes and structure, and attempts to exploit common applications."
+        },
+        {
+          "title": "Acts",
+          "desc": "Before or at execution: blocks the file, quarantines it, denies the USB device or the exploit."
+        },
+        {
+          "title": "Methods",
+          "desc": "Signatures, hash reputation, static machine learning, exploit protection, application and device control."
+        },
+        {
+          "title": "Blind to",
+          "desc": "What happens after something is allowed to run: legitimate tools used maliciously, stolen credentials, slow hands-on attacks."
+        }
+      ]
+    },
+    {
+      "id": "edr",
+      "tag": "X2",
+      "title": "EDR",
+      "sub": "Endpoint Detection & Response",
+      "desc": "Records what happens on the endpoint continuously, detects malicious behavior in that recording, and gives the analyst tools to investigate and respond.",
+      "children": [
+        {
+          "title": "Sees",
+          "desc": "Detailed telemetry: every process with its command line and parent, network connections, DNS requests, file and registry changes, logons."
+        },
+        {
+          "title": "Acts",
+          "desc": "During and after execution: kill a process, quarantine a file, isolate the host from the network, open a remote shell for live response."
+        },
+        {
+          "title": "Investigation",
+          "desc": "Process trees, host timelines, and searchable history let an analyst reconstruct what happened, and hunt for the same activity on other hosts."
+        },
+        {
+          "title": "Blind to",
+          "desc": "Devices without an agent (printers, IoT, unmanaged laptops), network-only activity, and identity or cloud events outside the host."
+        }
+      ]
+    },
+    {
+      "id": "ndr",
+      "tag": "X3",
+      "title": "NDR",
+      "sub": "Network Detection & Response",
+      "desc": "Watches network traffic rather than hosts, usually from a copy of the traffic (SPAN port or TAP) at key points.",
+      "children": [
+        {
+          "title": "Sees",
+          "desc": "Who talks to whom, how much, on which protocol — flows, packet metadata, DNS, TLS fingerprints — including devices that cannot run an agent."
+        },
+        {
+          "title": "Acts",
+          "desc": "In transit: alerts, and through integrations blocks traffic at the firewall or resets the connection."
+        },
+        {
+          "title": "Good at",
+          "desc": "Lateral movement between hosts, C2 beaconing patterns, large data transfers, and rogue or unmanaged devices."
+        },
+        {
+          "title": "Blind to",
+          "desc": "What happens inside a host — which process, which user, which command. Encrypted traffic can be judged only by metadata."
+        }
+      ]
+    },
+    {
+      "id": "xdr",
+      "tag": "X4",
+      "title": "XDR",
+      "sub": "Extended Detection & Response",
+      "desc": "Extends detection and response beyond the endpoint by correlating several sources — endpoint, identity, email, cloud, network — into single incidents.",
+      "children": [
+        {
+          "title": "Sees",
+          "desc": "Combined telemetry: EDR data plus identity sign-ins, email, cloud workloads, and network data."
+        },
+        {
+          "title": "Acts",
+          "desc": "Across controls from one console: isolate the host, disable the account, pull the phishing email from every mailbox."
+        },
+        {
+          "title": "Correlation",
+          "desc": "A phishing email, the macro that ran, and the account then used from a new location become one incident instead of three unrelated alerts."
+        },
+        {
+          "title": "Native vs open",
+          "desc": "Native XDR uses one vendor's products end to end; open XDR ingests third-party tools. Falcon Insight XDR is endpoint-centred and extended outward."
+        },
+        {
+          "title": "vs SIEM",
+          "desc": "SIEM collects any log for search, compliance, and correlation. XDR is narrower but ships ready detections and built-in response. Many SOCs run both."
+        }
+      ]
+    },
+    {
+      "id": "compare",
+      "tag": "X5",
+      "title": "Side by Side",
+      "sub": "The answer",
+      "desc": "The mentor's question in one place: what each sees, where each acts, and how they differ.",
+      "children": [
+        {
+          "title": "Data seen",
+          "desc": "EPP: files. EDR: everything on the host over time. NDR: traffic between hosts. XDR: all of these plus identity, email, and cloud."
+        },
+        {
+          "title": "Point of action",
+          "desc": "EPP: before execution. EDR: during and after, on the host. NDR: in transit, on the network. XDR: wherever the incident touches."
+        },
+        {
+          "title": "Main question answered",
+          "desc": "EPP: is this file bad? EDR: what did this process do? NDR: what is this host talking to? XDR: what is the whole attack?"
+        },
+        {
+          "title": "Where each is blind",
+          "desc": "EPP after execution, EDR off the host, NDR inside the host. XDR depends on which sources feed it."
+        },
+        {
+          "title": "How they combine",
+          "desc": "Modern endpoint agents bundle EPP and EDR. NDR covers devices without agents. XDR or the SIEM ties them together."
+        }
+      ]
+    }
+  ]
+}

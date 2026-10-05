@@ -36,7 +36,11 @@ SOC Intern Notes/
     ├── containers-k8s.json
     ├── cloud-fundamentals.json
     ├── logging-siem.json
-    └── network-basics.json
+    ├── network-basics.json
+    ├── hashing.json
+    ├── malware-detection.json
+    ├── mitre-attack.json
+    └── detection-response.json
 ```
 
 The single source of truth for content is `data/*.json`. Never edit the

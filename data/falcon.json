@@ -150,6 +150,134 @@
           "desc": "Runs an automated action (playbook) after a detection fires."
         }
       ]
+    },
+    {
+      "id": "mitre-in-falcon",
+      "tag": "M9",
+      "title": "MITRE in Falcon",
+      "sub": "Detection framework",
+      "desc": "Falcon labels every detection with where it sits in an attack, using MITRE ATT&CK as the backbone. Verify the exact category names against the 'MITRE-Based Falcon Detections Framework' page in the CrowdStrike docs.",
+      "children": [
+        {
+          "title": "Tactic & technique label",
+          "desc": "Each detection shows an ATT&CK tactic and technique, often with the ID (for example Credential Access via OS Credential Dumping, T1003). The label explains why the behavior is considered malicious."
+        },
+        {
+          "title": "Objective layer",
+          "desc": "Above tactics, CrowdStrike groups detections by the attacker's broader objective — such as gaining access, keeping access, or following through — so an analyst sees how far the attack has progressed."
+        },
+        {
+          "title": "Non-ATT&CK categories",
+          "desc": "Detections that come from a method rather than a behavior — machine learning on a file, known malware, intel or custom IOC matches — appear under CrowdStrike's own tactic names instead of an ATT&CK tactic."
+        },
+        {
+          "title": "Why the mapping helps",
+          "desc": "The analyst immediately knows the stage: Execution means something ran; Credential Access or Lateral Movement means the attack is already spreading and urgency rises."
+        },
+        {
+          "title": "Linking out",
+          "desc": "The technique ID connects the detection to the ATT&CK page: other ways the same goal is reached, mitigations, and groups known to use it."
+        },
+        {
+          "title": "Coverage",
+          "desc": "Because detections are mapped, detection coverage can be laid over the ATT&CK matrix to see which techniques are and are not covered."
+        }
+      ]
+    },
+    {
+      "id": "detection-anatomy",
+      "tag": "M10",
+      "title": "Detection Anatomy",
+      "sub": "What a detection holds",
+      "desc": "The fields an analyst reads in a Falcon detection, and what each one answers. Most appear both in the detection summary and on the process node that triggered it.",
+      "children": [
+        {
+          "title": "Host",
+          "desc": "Hostname, OS, sensor (agent) ID, last-seen IP, site or OU, and host groups — which machine, and what kind."
+        },
+        {
+          "title": "User",
+          "desc": "The account the process ran as, and the logon session. Tells you whether a person, a service account, or SYSTEM was involved."
+        },
+        {
+          "title": "Process & command line",
+          "desc": "File name, full path, and the exact command line with arguments. Usually the single most revealing field: encoded PowerShell or a download URL shows intent."
+        },
+        {
+          "title": "Hashes",
+          "desc": "SHA-256 and MD5 of the file, used for reputation lookups and to search whether the same file ran on other hosts."
+        },
+        {
+          "title": "Network & DNS",
+          "desc": "Connections the process made and domains it resolved — candidate C2 servers and download sources."
+        },
+        {
+          "title": "Verdict & action",
+          "desc": "Severity, the tactic and technique, a description of the behavior, and what Falcon already did: blocked, killed the process, quarantined the file, or only detected."
+        }
+      ]
+    },
+    {
+      "id": "process-tree-deep",
+      "tag": "M11",
+      "title": "Reading a Process Tree",
+      "sub": "Parent → child",
+      "desc": "The chain of processes that led to the detection, from the earliest ancestor down to what the triggering process spawned. Context that a single event cannot give.",
+      "children": [
+        {
+          "title": "Parent-child",
+          "desc": "Every process is started by another. explorer.exe → winword.exe is a user opening a document; winword.exe → powershell.exe is a document running code."
+        },
+        {
+          "title": "Triggering process",
+          "desc": "The node that matched the detection logic is highlighted. Read upward for how it started, downward for what it did next."
+        },
+        {
+          "title": "Suspicious lineages",
+          "desc": "Office or browser spawning a shell, a service host launching a script from a temp folder, rundll32 with no arguments, a process named like a system file in the wrong path."
+        },
+        {
+          "title": "Per-node details",
+          "desc": "Each node carries its own command line, user, hashes, and network and file activity, so the whole story can be read from the tree."
+        },
+        {
+          "title": "Scope",
+          "desc": "Siblings and children show whether the attack went further — a dropped file, a scheduled task, a connection out."
+        }
+      ]
+    },
+    {
+      "id": "analyst-flow",
+      "tag": "M12",
+      "title": "Analyst Workflow",
+      "sub": "Triage order",
+      "desc": "One reasonable order for working a detection, from first look to closing it.",
+      "children": [
+        {
+          "title": "1. Read the summary",
+          "desc": "Severity, tactic and technique, and what action Falcon already took. A blocked execution is less urgent than a detection-only credential dump."
+        },
+        {
+          "title": "2. Context",
+          "desc": "Which host and user: server or workstation, admin or regular user, critical asset or test machine."
+        },
+        {
+          "title": "3. Process tree & command line",
+          "desc": "Reconstruct what happened and whether it makes sense — an IT script, an installer, or an attack."
+        },
+        {
+          "title": "4. Enrich",
+          "desc": "Look up hashes, domains, and IPs in threat intel and reputation services."
+        },
+        {
+          "title": "5. Scope",
+          "desc": "Search for the same hash, command line, or domain on other hosts. One host or many?"
+        },
+        {
+          "title": "6. Decide and act",
+          "desc": "True positive: contain (network-isolate the host, kill, quarantine) and escalate. False positive: close with a clear reason, and suggest tuning so it does not recur."
+        }
+      ]
     }
   ],
   "url": "https://claude.ai/artifact/7vA3RB2wV2gWgyQ1VPX37i"
