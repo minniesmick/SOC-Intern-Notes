@@ -40,7 +40,8 @@ SOC Intern Notes/
     ├── hashing.json
     ├── malware-detection.json
     ├── mitre-attack.json
-    └── detection-response.json
+    ├── detection-response.json
+    └── virtualization.json
 ```
 
 The single source of truth for content is `data/*.json`. Never edit the

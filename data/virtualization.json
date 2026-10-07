@@ -1,0 +1,346 @@
+{
+  "id": "virtualization",
+  "slug": "virt",
+  "emoji": "🖥️",
+  "accent": "#f4a261",
+  "accentDim": "#4a3020",
+  "title": "Virtualization Concept Map",
+  "subtitle": "From one physical server to many virtual ones: hypervisors, containers, and VMware ESXi. Tap a bubble.",
+  "searchPlaceholder": "Search: e.g. Type 1, vSwitch, datastore…",
+  "rootLabel": "Virtualization",
+  "rootTitle": "Virtualization",
+  "rootDesc": "Virtualization runs several isolated computers on one physical machine by putting a software layer between the hardware and the operating systems. Almost every server in a modern data center is virtual, which is why an analyst investigating 'a server' is usually looking at a virtual machine on a hypervisor such as VMware ESXi.",
+  "modules": [
+    {
+      "id": "why",
+      "tag": "V1",
+      "title": "Why Virtualize?",
+      "sub": "Purpose",
+      "desc": "Physical servers used to run one application each and sat mostly idle. Virtualization shares one machine's CPU, memory, disk, and network among many isolated systems.",
+      "children": [
+        {
+          "title": "Consolidation",
+          "desc": "Dozens of virtual servers on a handful of physical hosts. Less hardware, power, cooling, and rack space."
+        },
+        {
+          "title": "Isolation",
+          "desc": "Each virtual machine has its own operating system. A crash or compromise in one does not directly affect the others."
+        },
+        {
+          "title": "Speed",
+          "desc": "A new server is created in minutes from a template instead of ordering and racking hardware — the reason test servers can be spun up for a single project."
+        },
+        {
+          "title": "Snapshots & recovery",
+          "desc": "Save a machine's state before a change and roll back if it fails. Whole VMs can be backed up and restored as files."
+        },
+        {
+          "title": "Mobility & availability",
+          "desc": "Running VMs can move between hosts without downtime, and restart automatically on another host if one fails. VMs can also be replicated to a disaster recovery site."
+        },
+        {
+          "title": "Labs",
+          "desc": "Safe, disposable environments for testing patches, training, or analysing malware without risking real systems."
+        }
+      ]
+    },
+    {
+      "id": "vm",
+      "tag": "V2",
+      "title": "Virtual Machine",
+      "sub": "VM",
+      "desc": "A complete computer made of software: virtual CPU, memory, disk, and network card, running its own operating system as if it were on real hardware.",
+      "children": [
+        {
+          "title": "Host vs guest",
+          "desc": "The host is the physical machine (or the hypervisor on it). The guest is the operating system running inside the VM, which usually does not know it is virtual."
+        },
+        {
+          "title": "Virtual hardware",
+          "desc": "vCPUs, vRAM, virtual disks, virtual network adapters, and virtual BIOS/UEFI. Each can be resized without touching physical hardware."
+        },
+        {
+          "title": "A VM is files",
+          "desc": "On ESXi a VM is a folder: .vmx holds the configuration, .vmdk the disk, .nvram the firmware settings, vmware.log the VM's log. Copying the files copies the machine."
+        },
+        {
+          "title": "Snapshot",
+          "desc": "A point-in-time state of the disk (and optionally memory). Useful before changes, but not a backup: it lives on the same storage and slows the VM if kept for long."
+        },
+        {
+          "title": "Template & clone",
+          "desc": "A template is a master VM used to create identical new ones. OVF/OVA is the portable format for moving VMs between platforms."
+        },
+        {
+          "title": "Guest tools",
+          "desc": "Drivers installed inside the guest (VMware Tools, Hyper-V integration services) for better performance, clean shutdown, and reporting the guest's IP and hostname to the hypervisor."
+        }
+      ]
+    },
+    {
+      "id": "type1",
+      "tag": "V3",
+      "title": "Type 1 Hypervisor",
+      "sub": "Bare metal",
+      "desc": "Installed directly on the physical server with no general-purpose operating system underneath. The hypervisor is the operating system of the host.",
+      "children": [
+        {
+          "title": "How it works",
+          "desc": "Hardware → hypervisor → VMs. The hypervisor talks to the hardware itself and schedules CPU and memory among the VMs."
+        },
+        {
+          "title": "Examples",
+          "desc": "VMware ESXi, Microsoft Hyper-V, Xen, and KVM-based platforms such as Proxmox VE and Nutanix AHV."
+        },
+        {
+          "title": "Strengths",
+          "desc": "Best performance, small attack surface, high stability. Built for data centers and production workloads."
+        },
+        {
+          "title": "Trade-offs",
+          "desc": "Needs a dedicated server and is managed remotely through a web or management console, not by sitting at the machine."
+        },
+        {
+          "title": "Hyper-V nuance",
+          "desc": "Even when enabled on Windows, Hyper-V is Type 1: it loads beneath Windows, which then itself runs as a privileged partition."
+        }
+      ]
+    },
+    {
+      "id": "type2",
+      "tag": "V4",
+      "title": "Type 2 Hypervisor",
+      "sub": "Hosted",
+      "desc": "Installed as an application on top of a normal operating system such as Windows, macOS, or Linux.",
+      "children": [
+        {
+          "title": "How it works",
+          "desc": "Hardware → host OS → hypervisor application → VMs. Every hardware request goes through the host operating system."
+        },
+        {
+          "title": "Examples",
+          "desc": "Oracle VirtualBox, VMware Workstation, VMware Fusion, Parallels Desktop."
+        },
+        {
+          "title": "Strengths",
+          "desc": "Easy to install on a laptop, ideal for personal labs, testing, training, and running another OS alongside your own."
+        },
+        {
+          "title": "Trade-offs",
+          "desc": "Extra layer means lower performance, and the VMs depend on the host OS — if it crashes or is compromised, they are affected too."
+        }
+      ]
+    },
+    {
+      "id": "container",
+      "tag": "V5",
+      "title": "Container Virtualization",
+      "sub": "OS-level",
+      "desc": "Virtualizes the operating system rather than the hardware. Containers share the host's kernel and are isolated from each other only by kernel features. See the Containers & Kubernetes map for depth.",
+      "children": [
+        {
+          "title": "How it works",
+          "desc": "Hardware → host OS and kernel → container runtime → containers. Each container holds only the application and its libraries, not a whole operating system."
+        },
+        {
+          "title": "Isolation mechanism",
+          "desc": "Linux namespaces give each container its own view of processes, network, and filesystem; cgroups limit its CPU and memory."
+        },
+        {
+          "title": "Examples",
+          "desc": "Docker, containerd, Podman, and Kubernetes to orchestrate them at scale."
+        },
+        {
+          "title": "Strengths",
+          "desc": "Megabytes instead of gigabytes, starts in seconds, packs far more workloads per host, and runs the same everywhere."
+        },
+        {
+          "title": "Trade-offs",
+          "desc": "Weaker isolation than a VM: a kernel vulnerability can affect every container on the host. Containers must use the host's kernel type — Linux containers need a Linux kernel."
+        }
+      ]
+    },
+    {
+      "id": "compare",
+      "tag": "V6",
+      "title": "Side by Side",
+      "sub": "Type 1 · Type 2 · Container",
+      "desc": "The core differences in one place — what sits under the workload, and what that means for performance and isolation.",
+      "children": [
+        {
+          "title": "What is virtualized",
+          "desc": "Type 1 and Type 2 virtualize hardware, so each VM runs a full OS. Containers virtualize the OS, so they share one kernel."
+        },
+        {
+          "title": "What runs underneath",
+          "desc": "Type 1: nothing but the hypervisor. Type 2: a full host OS. Container: the host OS kernel plus a runtime."
+        },
+        {
+          "title": "Performance & size",
+          "desc": "Containers are lightest, Type 1 is close to physical speed, Type 2 carries the most overhead."
+        },
+        {
+          "title": "Isolation strength",
+          "desc": "Type 1 strongest, Type 2 depends on the host OS, containers weakest because of the shared kernel."
+        },
+        {
+          "title": "Typical use",
+          "desc": "Type 1: production data centers. Type 2: personal labs and desktops. Containers: microservices and cloud-native apps, often running inside VMs on a Type 1 hypervisor."
+        }
+      ]
+    },
+    {
+      "id": "esxi",
+      "tag": "E1",
+      "title": "VMware ESXi",
+      "sub": "What it is",
+      "desc": "VMware's Type 1 hypervisor and the most widespread in enterprise data centers. A small, purpose-built OS whose core is the VMkernel; it does nothing except run VMs.",
+      "children": [
+        {
+          "title": "VMkernel",
+          "desc": "The ESXi core that schedules CPU, manages memory, and handles storage and network I/O for every VM on the host."
+        },
+        {
+          "title": "Host Client",
+          "desc": "The web interface of a single host, reached in a browser at https://<host-ip>/ui. Used to create VMs, configure networking and storage, and open VM consoles."
+        },
+        {
+          "title": "DCUI",
+          "desc": "The text console on the physical server's screen (F2), used for initial setup: management IP, root password, enabling troubleshooting services."
+        },
+        {
+          "title": "vCenter Server",
+          "desc": "Central management for many ESXi hosts. Adds clusters, vMotion (live migration), HA (automatic restart on host failure), DRS (load balancing), and templates."
+        },
+        {
+          "title": "vSphere",
+          "desc": "The product family name: ESXi hypervisors plus vCenter together."
+        },
+        {
+          "title": "Ownership",
+          "desc": "Broadcom acquired VMware in 2023 and moved licensing to subscriptions, which pushed some organizations to evaluate alternatives such as Proxmox, Nutanix, or Hyper-V."
+        }
+      ]
+    },
+    {
+      "id": "esxi-net",
+      "tag": "E2",
+      "title": "ESXi Networking",
+      "sub": "vSwitch & port groups",
+      "desc": "VMs connect to virtual switches inside the host, which connect to the physical network through the host's real network cards.",
+      "children": [
+        {
+          "title": "Uplinks",
+          "desc": "The host's physical NICs (vmnic0, vmnic1…). They connect the virtual switch to the physical network; two or more give redundancy."
+        },
+        {
+          "title": "Standard vSwitch",
+          "desc": "A software switch on one host. vSwitch0 is created at install time."
+        },
+        {
+          "title": "Port group",
+          "desc": "A named set of ports on a vSwitch with shared settings, usually a VLAN ID. A VM's network adapter is attached to a port group, which decides which network segment it is on."
+        },
+        {
+          "title": "VMkernel port",
+          "desc": "A network interface for the host itself rather than for VMs: management traffic, vMotion, storage. The management IP lives here."
+        },
+        {
+          "title": "Distributed switch",
+          "desc": "With vCenter, one switch configuration spans many hosts, so a VM keeps the same network settings when it moves."
+        }
+      ]
+    },
+    {
+      "id": "esxi-storage",
+      "tag": "E3",
+      "title": "ESXi Storage",
+      "sub": "Datastores",
+      "desc": "Where VM files live. ESXi presents every kind of storage — local disks, SAN, NAS — as a datastore.",
+      "children": [
+        {
+          "title": "Datastore",
+          "desc": "A storage container that holds VM folders, ISO images, and templates."
+        },
+        {
+          "title": "VMFS",
+          "desc": "VMware's cluster file system for block storage (local disks, Fibre Channel, iSCSI). Several hosts can use the same datastore at once."
+        },
+        {
+          "title": "NFS / vSAN",
+          "desc": "NFS mounts network file shares as datastores. vSAN pools the local disks of several hosts into one shared datastore."
+        },
+        {
+          "title": "Thin vs thick",
+          "desc": "A thin disk uses space only as data is written; a thick disk reserves its full size up front. Thin saves space but risks running out if overcommitted."
+        }
+      ]
+    },
+    {
+      "id": "esxi-create",
+      "tag": "E4",
+      "title": "Creating a VM",
+      "sub": "Host Client steps",
+      "desc": "The basic flow in the ESXi Host Client. vCenter offers the same wizard with extra placement options.",
+      "children": [
+        {
+          "title": "1. Start the wizard",
+          "desc": "Virtual Machines → Create / Register VM → Create a new virtual machine."
+        },
+        {
+          "title": "2. Name & guest OS",
+          "desc": "Give the VM a name, choose the compatibility version, and select the guest OS family and version so ESXi picks suitable virtual hardware."
+        },
+        {
+          "title": "3. Storage",
+          "desc": "Choose the datastore that will hold the VM's folder and disks."
+        },
+        {
+          "title": "4. Customize hardware",
+          "desc": "Set vCPUs, memory, disk size and thin/thick provisioning, network adapter type (VMXNET3) and port group, and attach an installation ISO from a datastore to the CD/DVD drive."
+        },
+        {
+          "title": "5. Install the OS",
+          "desc": "Power on, open the web console, and install the guest operating system from the ISO as on a physical machine."
+        },
+        {
+          "title": "6. Finish setup",
+          "desc": "Install VMware Tools, set the IP address, patch, and take a snapshot or convert to a template if more copies will be needed."
+        }
+      ]
+    },
+    {
+      "id": "esxi-soc",
+      "tag": "E5",
+      "title": "ESXi in the SOC",
+      "sub": "Why it matters",
+      "desc": "One ESXi host can run dozens of critical servers, so it is one of the most valuable targets in a network and needs its own monitoring.",
+      "children": [
+        {
+          "title": "High-value target",
+          "desc": "Compromising the hypervisor reaches every VM on it at once. Several ransomware groups ship ESXi-specific versions that encrypt the VM disk files directly."
+        },
+        {
+          "title": "Visibility gap",
+          "desc": "Standard endpoint agents run inside the guest VMs, not on the ESXi host itself. Host activity is visible mainly through ESXi and vCenter logs."
+        },
+        {
+          "title": "Logs to collect",
+          "desc": "Forward ESXi syslog to the SIEM: hostd.log (management actions), vmkernel.log, auth.log and shell.log (logins and shell commands), plus vCenter events."
+        },
+        {
+          "title": "What to watch",
+          "desc": "Logins to the Host Client or SSH from unusual sources, SSH or the ESXi shell being enabled, new local accounts, mass VM power-offs, and snapshot or datastore deletions."
+        },
+        {
+          "title": "Hardening",
+          "desc": "Management interfaces only on an isolated management network, SSH off by default, lockdown mode, prompt patching, and vCenter access tied to named accounts with MFA."
+        },
+        {
+          "title": "Forensics",
+          "desc": "A snapshot with memory captures a running VM's RAM and disk without shutting it down — useful evidence during an investigation."
+        }
+      ]
+    }
+  ]
+}
